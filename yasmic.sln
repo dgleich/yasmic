@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yasmic", "yasmic\yasmic.vcproj", "{0709DF5B-61F2-4AC8-A8D9-667493063EBC}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "E:\...\doc\", "doc", "{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.VirtualPath = "/doc"
+		Debug.AspNetCompiler.PhysicalPath = "doc\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\doc\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "true"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/doc"
+		Release.AspNetCompiler.PhysicalPath = "doc\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\doc\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "true"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "17983"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|.NET = Debug|.NET
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|Win32 = Debug|Win32
+		Release|.NET = Release|.NET
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0709DF5B-61F2-4AC8-A8D9-667493063EBC}.Debug|.NET.ActiveCfg = Debug|Win32
+		{0709DF5B-61F2-4AC8-A8D9-667493063EBC}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{0709DF5B-61F2-4AC8-A8D9-667493063EBC}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{0709DF5B-61F2-4AC8-A8D9-667493063EBC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0709DF5B-61F2-4AC8-A8D9-667493063EBC}.Debug|Win32.Build.0 = Debug|Win32
+		{0709DF5B-61F2-4AC8-A8D9-667493063EBC}.Release|.NET.ActiveCfg = Release|Win32
+		{0709DF5B-61F2-4AC8-A8D9-667493063EBC}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{0709DF5B-61F2-4AC8-A8D9-667493063EBC}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{0709DF5B-61F2-4AC8-A8D9-667493063EBC}.Release|Win32.ActiveCfg = Release|Win32
+		{0709DF5B-61F2-4AC8-A8D9-667493063EBC}.Release|Win32.Build.0 = Release|Win32
+		{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}.Debug|.NET.ActiveCfg = Debug|.NET
+		{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}.Debug|.NET.Build.0 = Debug|.NET
+		{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}.Debug|Mixed Platforms.ActiveCfg = Debug|.NET
+		{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}.Debug|Mixed Platforms.Build.0 = Debug|.NET
+		{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}.Debug|Win32.ActiveCfg = Debug|.NET
+		{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}.Release|.NET.ActiveCfg = Debug|.NET
+		{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}.Release|.NET.Build.0 = Debug|.NET
+		{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
+		{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}.Release|Mixed Platforms.Build.0 = Debug|.NET
+		{9A3EBDBD-A76E-4083-85CB-93D21CA5EA9A}.Release|Win32.ActiveCfg = Debug|.NET
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
