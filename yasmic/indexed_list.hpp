@@ -17,15 +17,12 @@ namespace yasmic
 	 */
 	namespace impl
 	{
-		template <class Val, class Collection>
-		struct indexed_list_nonzero_iterator
-		{
-			// provide an implementation of the non-zero iterator
-		}
+		
 	};
 
 	/**
-	 * indexed_list provides an implementation of NumericMatrix and NonzeroIterable.
+	 * indexed_list provides a lightweight wrapper 
+	 * implementation of NumericMatrix and NonzeroIterable.
 	 *
 	 * @implements NumericMatrix, NonzeroIterable
 	 *
@@ -40,6 +37,7 @@ namespace yasmic
 	struct indexed_list
 	{
 	public:
+        
 		// required types
 		typedef typename NonzeroIterator::size_type size_type;
 		typedef size_type index_type;
@@ -56,7 +54,7 @@ namespace yasmic
 		{
 			nonzero_iterator i = _start;
 
-			_nnz = std::difference(start,end);
+			_nnz = 0;
 			
 			while (i != _end)
 			{
@@ -64,6 +62,7 @@ namespace yasmic
 				_ncols = std::max(get<1>(*i),_ncols);
 
 				++i;
+				++_nnz;
 			}
 
 			// we underestimate by one value

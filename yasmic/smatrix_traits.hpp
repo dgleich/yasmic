@@ -15,8 +15,8 @@ namespace yasmic
 	template <class Op>
 	struct op_traits
 	{
-		typedef typename Mat::size_type size_type;
-	}
+		typedef typename Op::size_type size_type;
+	};
 
 	template <class Mat>
 	struct smatrix_traits : public op_traits<Mat>
@@ -25,12 +25,16 @@ namespace yasmic
 		typedef typename Mat::value_type value_type;
 
 		typedef typename Mat::nonzero_iterator nonzero_iterator;
+		typedef typename Mat::nonzero_descriptor nonzero_descriptor;
 
 		typedef typename Mat::row_iterator row_iterator;
+		
 		typedef typename Mat::row_nonzero_iterator row_nonzero_iterator;
+		typedef typename Mat::row_nonzero_descriptor row_nonzero_descriptor;
+		
 		typedef typename Mat::column_iterator column_iterator;
-		typedef typename Mat::column_nonzero_iterator column_iterator;
-	}
+		//typedef typename Mat::column_nonzero_iterator column_nonzero_iterator;
+	};
 }
 
 #endif // YASMIC_SMATRIX_TRAITS

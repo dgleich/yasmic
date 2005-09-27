@@ -1,0 +1,2 @@
+C:\Documents and Settings\David Gleich\My Documents\dev\yasmic>cl test\ifstream_
+as_matrix.cc /I. /I../boost_1_33_0 /Fea.exe /EHsc | more
