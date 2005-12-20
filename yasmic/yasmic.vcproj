@@ -177,6 +177,34 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\binary_ifstream_matrix.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\bind_utility.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\compressed_row_matrix.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\compressed_row_matrix_graph.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\generic_matrix_operations.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ifstream_as_matrix.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ifstream_matrix.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\indexed_list.hpp"
 				>
 			</File>
@@ -186,6 +214,10 @@
 			</File>
 			<File
 				RelativePath=".\smatrix_traits.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tuple_utility.hpp"
 				>
 			</File>
 		</Filter>

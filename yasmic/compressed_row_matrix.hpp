@@ -5,9 +5,11 @@
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
-#include <boost/bind.hpp>
+
+#include <boost/functional.hpp>
 
 #include <yasmic/tuple_utility.hpp>
+
 
 #include <yasmic/generic_matrix_operations.hpp>
 
@@ -38,13 +40,21 @@ namespace yasmic
                 RowIter ri, RowIter rend, ColIter ci, ValIter vi)
             : _ri(ri), _rend(rend), _ci(ci), _vi(vi), _id(0), _row(0)
             {
+				_ri++;
             	// skip over any empty rows
-            	while ( _ri != _rend && *_ri == _id )
+            	while ( _ri != _rend && *(_ri) == _id )
                 {
                    	// keep incrementing the row 
                    	++_ri; ++_row;
                 }
             }
+
+			compressed_row_nonzero_const_iterator(
+                RowIter ri, RowIter rend, ColIter ci, ValIter vi, 
+				typename std::iterator_traits<RowIter>::value_type id)
+			: _ri(ri), _rend(rend), _ci(ci), _vi(vi), _id(id), _row(0)
+			{
+			}
             
             
         private:
@@ -62,7 +72,7 @@ namespace yasmic
                 	// while we aren't at the end and the row isn't empty
                 	// (if *_ri == _id, then the row is empty because _id 
                 	// is the current index in the column/val array.)
-                	while ( _ri != _rend && *_ri == _id )
+                	while ( _ri != _rend && *(_ri) == _id )
                     {
                     	// keep incrementing the row 
                     	++_ri; ++_row;
@@ -72,9 +82,16 @@ namespace yasmic
             
             bool equal(compressed_row_nonzero_const_iterator const& other) const
             {
-                return (_ri == other._ri &&
-                    (_ri == _rend || _ci == other._ci) );
+                /*return (_ri == other._ri &&
+                    (_ri == _rend || _ci == other._ci) );*/
+
+				return (_ri == other._ri && _ci == other._ci);
             }
+
+			/*difference_type distance_to(compressed_row_nonzero_const_iterator const& other) const
+			{
+				return (_ci - other._ci);
+			}*/
             
             boost::tuple<
                 typename std::iterator_traits<RowIter>::value_type,
@@ -93,8 +110,6 @@ namespace yasmic
             ValIter _vi;
         };
 
-                
-        
 	}
 	
 	template <class RowIter, class ColIter, class ValIter>
@@ -111,17 +126,15 @@ namespace yasmic
 
 		typedef impl::compressed_row_nonzero_const_iterator<RowIter, ColIter, ValIter>
              nonzero_iterator;
-             
         
 		typedef boost::counting_iterator<size_type> row_iterator;
 		
-		typedef boost::binder1st(tuple_get_2<1,2, nonzero_descriptor>) 
+		typedef tuple_get_2_fn<1,2, nonzero_descriptor> 
             nonzero_to_row_nonzero_transform;
 		
 		typedef boost::tuple<index_type, value_type> row_nonzero_descriptor;
 		typedef boost::transform_iterator< nonzero_to_row_nonzero_transform, 
-            row_nonzero_iterator > row_nonzero_iterator;
-		
+            nonzero_iterator > row_nonzero_iterator;
 		
 		typedef void column_iterator;
 		typedef void column_nonzero_iterator;
@@ -175,7 +188,7 @@ namespace yasmic
         
         nonzero_iterator end_nonzeros()
         {
-        	return (nonzero_iterator(_rend, _rend, _cend, _vstart));
+        	return (nonzero_iterator(_rend-1, _rend, _cend, _vstart));
         }
         
         inline std::pair<size_type, size_type> dimensions()
@@ -201,17 +214,17 @@ namespace yasmic
         row_nonzero_iterator begin_row(index_type r)
         {
         	return (row_nonzero_iterator(nonzero_iterator(
-                _rstart + r, _rstart + r+1, _cstart + *(_rstart + _r), 
-                _vstart + *(_rstart + _r)), 
-                boost::bind(yasmic::tuple_get_2<1,2, nonzero_descriptor>, _1) ) );
+                _rstart + r, _rstart + r+1, _cstart + *(_rstart + r), 
+                _vstart + *(_rstart + r), *(_rstart+(r))), 
+                yasmic::tuple_get_2_fn<1,2, nonzero_descriptor>() ) );
         }
         
         row_nonzero_iterator end_row(index_type r)
         {
         	return (row_nonzero_iterator(nonzero_iterator(
-                _rstart + r + 1, _rend + r+1, _cstart + *(_rstart + (_r+1) ), 
-                _vstart + *(_rstart + _r)),
-                boost::bind(yasmic::tuple_get_2<1,2, nonzero_descriptor>, _1) ) );
+                _rstart + r, _rstart + r+1, _cstart + *(_rstart + (r+1) ), 
+                _vstart + *(_rstart + r), *(_rstart+(r+1)) ),
+                yasmic::tuple_get_2_fn<1,2, nonzero_descriptor>() ) );
         }
 		
     private:
@@ -222,7 +235,33 @@ namespace yasmic
         size_type _nrows, _ncols, _nnz;
 	};
 	
-    
+    /*template <class Matrix, class RowIter, class ColIter, class ValIter>
+	copy_matrix_to_compressed_row_data(Matrix& m,
+		RowIter rstart, RowIter rend, 
+        ColIter cstart, ColIter cend, ValIter vstart, ValIter vend,
+		)
+	{
+		smatrix_traits<simple_matrix>::nonzero_iterator nzi, nzend;
+    	tie(nzi, nzend) = nonzeros(m);
+    	for (; nzi != nzend; ++nzi)
+    	{
+            rows[row(*nzi, m)+1]++;
+    	}
+    	
+    	// compute the reduction
+    	partial_sum(rows.begin(), rows.end(), rows.begin());
+    	
+    	tie(nzi, nzend) = nonzeros(m);
+    	for (; nzi != nzend; ++nzi)
+    	{
+    		cout << "cur entry " << rows[row(*nzi, m)]+cur[row(*nzi, m)]
+    		     << " = " << boost::tuples::make_tuple(row(*nzi, m), column(*nzi, m), value(*nzi, m)) << endl;
+            cols[rows[row(*nzi, m)]+cur[row(*nzi, m)]] = column(*nzi, m);
+            vals[rows[row(*nzi, m)]+cur[row(*nzi, m)]] = value(*nzi, m);
+            cur[row(*nzi, m)]++;
+    	}
+	}*/
+
 }
 
 #endif // YASMIC_COMPRESSED_ROW_MATRIX

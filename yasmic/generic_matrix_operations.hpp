@@ -83,9 +83,18 @@ namespace yasmic
     {
     	return (boost::tuples::get<1>(n));
     }
+
+	template <class Matrix>
+    inline typename smatrix_traits<Matrix>::index_type 
+    column(boost::tuples::tuple< 
+            typename smatrix_traits<Matrix>::index_type,
+            typename smatrix_traits<Matrix>::value_type> n, const Matrix& f)
+    {
+    	return (boost::tuples::get<0>(n));
+    }
     
     template <class Matrix>
-    inline typename smatrix_traits<Matrix>::index_type 
+    inline typename smatrix_traits<Matrix>::value_type 
     value(boost::tuples::tuple<
             typename smatrix_traits<Matrix>::index_type, 
             typename smatrix_traits<Matrix>::index_type,
@@ -93,6 +102,28 @@ namespace yasmic
     {
     	return (boost::tuples::get<2>(n));
     }
+
+	/**
+	 * Overloaded function to return the value for a row/column non-zero as well.
+	 */
+	template <class Matrix>
+    inline typename smatrix_traits<Matrix>::value_type 
+    row_value(boost::tuples::tuple< 
+            typename smatrix_traits<Matrix>::index_type,
+            typename smatrix_traits<Matrix>::value_type> n, const Matrix& f) 
+    {
+    	return (boost::tuples::get<1>(n));
+    }
+
+	/*template <class Matrix>
+	inline typename smatrix_traits<Matrix>::value_type
+	row_value(boost::tuples::tuple<
+            typename smatrix_traits<Matrix>::index_type, 
+            typename smatrix_traits<Matrix>::index_type,
+            typename smatrix_traits<Matrix>::value_type> n, const Matrix& f)
+	{
+		return (boost::tuples::get<1>(n));
+	}*/
     
     template <class Matrix>
     inline std::pair<typename smatrix_traits<Matrix>::nonzero_iterator,

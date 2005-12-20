@@ -7,6 +7,8 @@
 #include <yasmic/smatrix_traits.hpp>
 #include <iterator>
 
+#include <yasmic/generic_matrix_operations.hpp>
+
 namespace yasmic
 {
 	template <>
