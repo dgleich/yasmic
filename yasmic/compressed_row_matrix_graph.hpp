@@ -245,9 +245,23 @@ namespace boost
 	}
 
 	template <class RowIter, class ColIter, class ValIter>
+	typename boost::graph_traits< yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> >::vertices_size_type
+	num_vertices(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g) 
+	{
+		return nrows(g);
+	}  
+
+	template <class RowIter, class ColIter, class ValIter>
+	typename boost::graph_traits< yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> >::vertices_size_type
+	num_edges(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+	{
+		return nnz(g);
+	}  
+
+	template <class RowIter, class ColIter, class ValIter>
 	typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::out_edges_ret
 	out_edges(typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor v,
-			  yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+			  const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
 	{
 		typedef typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::out_edge_iterator Iter;
 		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::out_edges_ret return_type;
@@ -271,7 +285,7 @@ namespace boost
 	typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::smatrix_traits::size_type
 	out_degree(
 		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor v,
-		yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+		const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
 	{
 		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::smatrix_traits::row_nonzero_iterator rnzi, rnziend;
 
@@ -287,7 +301,7 @@ namespace boost
 	typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::adjacent_ret 
 		adjacent_vertices(
 			typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor v,
-			yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+			const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
 	{
 		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::smatrix_traits::row_nonzero_iterator rnzi, rnziend;
 
@@ -302,7 +316,7 @@ namespace boost
 
 	template <class RowIter, class ColIter, class ValIter>
 	typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::vertices_ret 
-	vertices(yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+	vertices(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
 	{
 		//typedef typename boost::integer_range<typename EdgeList::value_type>
 		//::iterator Iter;

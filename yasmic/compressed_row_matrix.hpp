@@ -183,44 +183,44 @@ namespace yasmic
           _vstart(vstart), _vend(vend), _nrows(nrows), _ncols(ncols), _nnz(nnz)
         {}
         
-        nonzero_iterator begin_nonzeros()
+        nonzero_iterator begin_nonzeros() const
         {
         	return (nonzero_iterator(_rstart, _rend, _cstart, _vstart));
         }
         
-        nonzero_iterator end_nonzeros()
+        nonzero_iterator end_nonzeros() const
         {
         	return (nonzero_iterator(_rend-1, _rend, _cend, _vstart));
         }
         
-        inline std::pair<size_type, size_type> dimensions()
+        inline std::pair<size_type, size_type> dimensions() const
         {
         	return (std::make_pair(_nrows, _ncols));
         }
         
-        inline size_type nnz()
+        inline size_type nnz() const
         {
         	return (_nnz);
         }
         	
-        row_iterator begin_rows()
+        row_iterator begin_rows() const
         {
         	return (row_iterator(0));
         }
         
-        row_iterator end_rows()
+        row_iterator end_rows() const
         {
         	return (row_iterator(_nrows));
         }
         
-        row_nonzero_iterator begin_row(index_type r)
+        row_nonzero_iterator begin_row(index_type r) const
         {
 			return (row_nonzero_iterator(
                 _rstart + r, _rstart + r+1, _cstart + *(_rstart + r), 
                 _vstart + *(_rstart + r), *(_rstart+(r)), r));
         }
         
-        row_nonzero_iterator end_row(index_type r)
+        row_nonzero_iterator end_row(index_type r) const
         {
 			return (row_nonzero_iterator(
                 _rstart + r, _rstart + r+1, _cstart + *(_rstart + (r+1) ), 
