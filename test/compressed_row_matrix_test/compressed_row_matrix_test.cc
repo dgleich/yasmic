@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 			tie(rnzi, rnziend) = row_nonzeros(*ri, crm);
 			for (; rnzi != rnziend; ++rnzi)
 			{
-				cout << *ri << " " << column(*rnzi, crm) << " " << row_value(*rnzi, crm) << endl;
+				cout << *ri << " " << column(*rnzi, crm) << " " << value(*rnzi, crm) << endl;
 				//cout << *rnzi << " " << column(*rnzi, crm) << endl;
 			}
 		}

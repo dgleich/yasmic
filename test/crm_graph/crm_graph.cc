@@ -85,6 +85,38 @@ int main(int argc, char **argv)
     cout << "ncols: " << ncols(crm) << endl;
     cout << "nnz: " << nnz(crm) << endl;
 
+	boost::property_map<crs_matrix, boost::edge_weight_t>::type edge_weight_map = get(boost::edge_weight, crm);
+
+	{
+    	smatrix_traits<crs_matrix>::nonzero_iterator nzi, nzend;
+    	tie(nzi, nzend) = nonzeros(crm);
+    	
+		for (; nzi != nzend; ++nzi)
+    	{
+    
+            cout << row(*nzi, crm) << " " << column(*nzi, crm) << " " << value(*nzi, crm) << endl;
+    	}
+
+		smatrix_traits<crs_matrix>::row_iterator ri, riend;
+		
+
+		ri = crm.begin_rows();
+		riend = crm.end_rows();
+
+		for (; ri != riend; ++ri)
+		{
+			cout << "row_start: " << *ri << endl;
+
+			smatrix_traits<crs_matrix>::row_nonzero_iterator rnzi, rnziend;
+			tie(rnzi, rnziend) = row_nonzeros(*ri, crm);
+			for (; rnzi != rnziend; ++rnzi)
+			{
+				cout << *ri << " " << column(*rnzi, crm) << " " << value(*rnzi, crm) << endl;
+				//cout << *rnzi << " " << column(*rnzi, crm) << endl;
+			}
+		}
+    }
+
 
 	{
 		using namespace boost;
@@ -97,6 +129,13 @@ int main(int argc, char **argv)
 			BGL_FORALL_ADJ(u,v,crm, crs_matrix)
 			{
 				cout << u << " links to " << v << endl;
+			}
+
+			cout << " by outedges ... " << endl;
+
+			BGL_FORALL_OUTEDGES(u,e,crm, crs_matrix)
+			{
+				cout << source(e,crm) << " links to " << target(e, crm) << " with weight " << edge_weight_map[e] << endl;
 			}
 		}
 
