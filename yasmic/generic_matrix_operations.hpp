@@ -1,12 +1,42 @@
 #ifndef YASMIC_GENERIC_MATRIX_OPERATIONS
 #define YASMIC_GENERIC_MATRIX_OPERATIONS
 
-
+#include <boost/tuple/tuple.hpp>
 #include <yasmic/smatrix_traits.hpp>
+#include <utility>
+
     
 namespace yasmic
 {   
-	
+	/**
+	 * Simple nonzero class for most of the work.
+	 */
+
+	template <class Index, class Value, class NonzeroIndex>
+	struct simple_nonzero
+	{
+		simple_nonzero(Index row, Index col, Value val, NonzeroIndex nzi)
+			: _row(row), _column(col), _val(val), _nzi(nzi)
+		{}
+
+		Index _row;
+		Index _column;
+		Value _val;
+		NonzeroIndex _nzi;
+
+		typedef Index index_type;
+		typedef Value value_type;
+		typedef NonzeroIndex nz_index_type;
+	};
+
+	template <class Index, class Value, class NonzeroIndex>
+	simple_nonzero<Index, Value, NonzeroIndex>
+	make_simple_nonzero(Index r, Index c, Value v, NonzeroIndex nzi)
+	{
+		return simple_nonzero<Index, Value, NonzeroIndex>(r, c, v, nzi);
+	}
+
+
     /**
      * Determine the number of nonzeros in a matrix.
      *
@@ -73,6 +103,16 @@ namespace yasmic
     {
     	return (boost::tuples::get<0>(n));
     }
+
+	template <class Matrix>
+	inline typename smatrix_traits<Matrix>::index_type
+	row(simple_nonzero<
+			typename smatrix_traits<Matrix>::index_type, 
+			typename smatrix_traits<Matrix>::value_type,
+			typename smatrix_traits<Matrix>::nz_index_type> n, const Matrix& f)
+	{
+		return n._row;
+	}
     
     template <class Matrix>
     inline typename smatrix_traits<Matrix>::index_type 
@@ -85,12 +125,31 @@ namespace yasmic
     }
 
 	template <class Matrix>
+	inline typename smatrix_traits<Matrix>::index_type
+	column(simple_nonzero<
+			typename smatrix_traits<Matrix>::index_type, 
+			typename smatrix_traits<Matrix>::value_type,
+			typename smatrix_traits<Matrix>::nz_index_type> n, const Matrix& f)
+	{
+		return n._column;
+	}
+
+	/*template <class Matrix>
     inline typename smatrix_traits<Matrix>::index_type 
     column(boost::tuples::tuple< 
             typename smatrix_traits<Matrix>::index_type,
             typename smatrix_traits<Matrix>::value_type> n, const Matrix& f)
     {
     	return (boost::tuples::get<0>(n));
+    }*/
+
+	template <class Matrix>
+    inline typename smatrix_traits<Matrix>::index_type 
+		column(std::pair< 
+            typename smatrix_traits<Matrix>::index_type,
+            typename smatrix_traits<Matrix>::value_type> n, const Matrix& f)
+    {
+    	return (n.first);
     }
     
     template <class Matrix>
@@ -103,17 +162,27 @@ namespace yasmic
     	return (boost::tuples::get<2>(n));
     }
 
+	template <class Matrix>
+	inline typename smatrix_traits<Matrix>::value_type
+	value(simple_nonzero<
+			typename smatrix_traits<Matrix>::index_type, 
+			typename smatrix_traits<Matrix>::value_type,
+			typename smatrix_traits<Matrix>::nz_index_type> n, const Matrix& f)
+	{
+		return n._val;
+	}
+
 	/**
 	 * Overloaded function to return the value for a row/column non-zero as well.
 	 */
-	template <class Matrix>
+	/*template <class Matrix>
     inline typename smatrix_traits<Matrix>::value_type 
     row_value(boost::tuples::tuple< 
             typename smatrix_traits<Matrix>::index_type,
             typename smatrix_traits<Matrix>::value_type> n, const Matrix& f) 
     {
     	return (boost::tuples::get<1>(n));
-    }
+    }*/
 
 	/*template <class Matrix>
 	inline typename smatrix_traits<Matrix>::value_type
@@ -124,6 +193,15 @@ namespace yasmic
 	{
 		return (boost::tuples::get<1>(n));
 	}*/
+
+	template <class Matrix>
+    inline typename smatrix_traits<Matrix>::value_type 
+	value(std::pair<
+			typename smatrix_traits<Matrix>::index_type,
+            typename smatrix_traits<Matrix>::value_type> n, const Matrix& f) 
+    {
+    	return (n.second);
+    }
     
     template <class Matrix>
     inline std::pair<typename smatrix_traits<Matrix>::nonzero_iterator,

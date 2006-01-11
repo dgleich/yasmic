@@ -97,6 +97,8 @@ namespace yasmic
 
 		typedef impl::binary_ifstream_matrix_const_iterator<i_index_type, i_value_type> nonzero_iterator;
 
+		typedef size_type nz_index_type;
+
 		typedef void row_iterator;
 		
 		typedef void row_nonzero_descriptor;

@@ -32,6 +32,8 @@ namespace yasmic
 
 		typedef std::istream_iterator<nonzero_descriptor> nonzero_iterator;
 
+		typedef i_size_type nz_index_type;
+
 		typedef void row_iterator;
 		
 		typedef void row_nonzero_descriptor;

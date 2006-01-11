@@ -31,6 +31,8 @@ namespace yasmic
 		
 		typedef typename Mat::row_nonzero_iterator row_nonzero_iterator;
 		typedef typename Mat::row_nonzero_descriptor row_nonzero_descriptor;
+
+		typedef size_type nz_index_type;
 		
 		typedef typename Mat::column_iterator column_iterator;
 		//typedef typename Mat::column_nonzero_iterator column_nonzero_iterator;

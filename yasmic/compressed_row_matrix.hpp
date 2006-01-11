@@ -18,20 +18,23 @@ namespace yasmic
 {
 	namespace impl
 	{
-	
+		/** 
+		 * The nonzero iterator for the crm matrix.
+		 */
+
 		template <class RowIter, class ColIter, class ValIter>
 		class compressed_row_nonzero_const_iterator
 		: public boost::iterator_facade<
             compressed_row_nonzero_const_iterator<RowIter, ColIter, ValIter>,
-            boost::tuple<
-                typename std::iterator_traits<RowIter>::value_type,
-                typename std::iterator_traits<ColIter>::value_type,
-                typename std::iterator_traits<ValIter>::value_type> const,
+			yasmic::simple_nonzero<
+				typename std::iterator_traits<RowIter>::value_type,
+				typename std::iterator_traits<ValIter>::value_type,
+				typename std::iterator_traits<RowIter>::value_type> const,
             boost::forward_traversal_tag, 
-            boost::tuple<
-                typename std::iterator_traits<RowIter>::value_type,
-                typename std::iterator_traits<ColIter>::value_type,
-                typename std::iterator_traits<ValIter>::value_type> const >
+            yasmic::simple_nonzero<
+				typename std::iterator_traits<RowIter>::value_type,
+				typename std::iterator_traits<ValIter>::value_type,
+				typename std::iterator_traits<RowIter>::value_type> const >
         {
         public:
             compressed_row_nonzero_const_iterator() {}
@@ -51,8 +54,9 @@ namespace yasmic
 
 			compressed_row_nonzero_const_iterator(
                 RowIter ri, RowIter rend, ColIter ci, ValIter vi, 
-				typename std::iterator_traits<RowIter>::value_type id)
-			: _ri(ri), _rend(rend), _ci(ci), _vi(vi), _id(id), _row(0)
+				typename std::iterator_traits<RowIter>::value_type id,
+				typename std::iterator_traits<RowIter>::value_type row = 0)
+			: _ri(ri), _rend(rend), _ci(ci), _vi(vi), _id(id), _row(row)
 			{
 			}
             
@@ -82,24 +86,21 @@ namespace yasmic
             
             bool equal(compressed_row_nonzero_const_iterator const& other) const
             {
-                /*return (_ri == other._ri &&
-                    (_ri == _rend || _ci == other._ci) );*/
+
 
 				return (_ri == other._ri && _ci == other._ci);
             }
 
-			/*difference_type distance_to(compressed_row_nonzero_const_iterator const& other) const
-			{
-				return (_ci - other._ci);
-			}*/
+			/*difference_type distance_to(compressed_row_nonzero_const_iterator const& other) const */
             
-            boost::tuple<
-                typename std::iterator_traits<RowIter>::value_type,
-                typename std::iterator_traits<ColIter>::value_type,
-                typename std::iterator_traits<ValIter>::value_type>  
+            yasmic::simple_nonzero<
+				typename std::iterator_traits<RowIter>::value_type,
+				typename std::iterator_traits<ValIter>::value_type,
+				typename std::iterator_traits<RowIter>::value_type> 
             dereference() const 
             { 
-            	return boost::make_tuple(_row, *_ci, *_vi);
+            	//return boost::make_tuple(_row, *_ci, *_vi);
+				return make_simple_nonzero(_row, *_ci, *_vi, _id);
             }
 
 
@@ -109,7 +110,6 @@ namespace yasmic
             ColIter _ci;
             ValIter _vi;
         };
-
 	}
 	
 	template <class RowIter, class ColIter, class ValIter>
@@ -121,20 +121,22 @@ namespace yasmic
 		typedef size_type index_type;
 		
 		typedef typename std::iterator_traits<ValIter>::value_type value_type;
+
+		typedef size_type nz_index_type;
 		
-		typedef boost::tuple<index_type, index_type, value_type> nonzero_descriptor;
+		
+		typedef simple_nonzero<index_type, value_type, nz_index_type> nonzero_descriptor;
 
 		typedef impl::compressed_row_nonzero_const_iterator<RowIter, ColIter, ValIter>
              nonzero_iterator;
         
 		typedef boost::counting_iterator<size_type> row_iterator;
-		
-		typedef tuple_get_2_fn<1,2, nonzero_descriptor> 
-            nonzero_to_row_nonzero_transform;
-		
-		typedef boost::tuple<index_type, value_type> row_nonzero_descriptor;
-		typedef boost::transform_iterator< nonzero_to_row_nonzero_transform, 
-            nonzero_iterator > row_nonzero_iterator;
+
+		typedef nonzero_descriptor row_nonzero_descriptor;
+		typedef impl::compressed_row_nonzero_const_iterator<RowIter, ColIter, ValIter>
+             row_nonzero_iterator;
+
+		typedef ValIter value_iterator;
 		
 		typedef void column_iterator;
 		typedef void column_nonzero_iterator;
@@ -213,19 +215,28 @@ namespace yasmic
         
         row_nonzero_iterator begin_row(index_type r)
         {
-        	return (row_nonzero_iterator(nonzero_iterator(
+			return (row_nonzero_iterator(
                 _rstart + r, _rstart + r+1, _cstart + *(_rstart + r), 
-                _vstart + *(_rstart + r), *(_rstart+(r))), 
-                yasmic::tuple_get_2_fn<1,2, nonzero_descriptor>() ) );
+                _vstart + *(_rstart + r), *(_rstart+(r)), r));
         }
         
         row_nonzero_iterator end_row(index_type r)
         {
-        	return (row_nonzero_iterator(nonzero_iterator(
+			return (row_nonzero_iterator(
                 _rstart + r, _rstart + r+1, _cstart + *(_rstart + (r+1) ), 
-                _vstart + *(_rstart + r), *(_rstart+(r+1)) ),
-                yasmic::tuple_get_2_fn<1,2, nonzero_descriptor>() ) );
+                _vstart + *(_rstart + r), *(_rstart+(r+1)), r ) );
         }
+
+		value_iterator begin_values() const
+		{
+			return (_vstart);
+		}
+
+		value_iterator end_values() const
+		{
+			return (_vend);
+		}
+
 		
     private:
         RowIter _rstart,_rend;
