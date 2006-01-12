@@ -178,7 +178,7 @@ namespace boost
 			crm_graph_edge_iter(
                 RowIter ri, RowIter rend, ColIter ci, 
 				typename std::iterator_traits<RowIter>::value_type id)
-			: _ri(ri), _rend(rend), _ci(ci), _vi(vi), _id(id), _row(0)
+			: _ri(ri), _rend(rend), _ci(ci), _id(id), _row(0)
 			{
 			}
 
@@ -412,3 +412,5 @@ namespace boost
 }
 
 #endif // YASMIC_COMPRESSED_ROW_MATRIX_GRAPH
+
+

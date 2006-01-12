@@ -31,8 +31,8 @@ namespace yasmic
 
     };
     
-    inline std::pair<typename smatrix_traits<std::ifstream>::size_type,
-                      typename smatrix_traits<std::ifstream>::size_type>
+    inline std::pair<smatrix_traits<std::ifstream>::size_type,
+                      smatrix_traits<std::ifstream>::size_type>
     dimensions(std::ifstream& f)
     {
     	smatrix_traits<std::ifstream>::size_type nrows,ncols;

@@ -276,3 +276,5 @@ namespace yasmic
 }
 
 #endif // YASMIC_COMPRESSED_ROW_MATRIX
+
+

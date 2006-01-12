@@ -76,7 +76,7 @@ namespace yasmic
     inline typename smatrix_traits<Matrix>::size_type 
     ncols(Matrix& m)
 	{
-		smatrix_traits<Matrix>::size_type nrows,ncols;
+		typename smatrix_traits<Matrix>::size_type nrows,ncols;
 		
 		boost::tie(nrows, ncols) = dimensions(m);
 		
@@ -87,7 +87,7 @@ namespace yasmic
     inline typename smatrix_traits<Matrix>::size_type 
 	nrows(Matrix& m)
 	{ 
-		smatrix_traits<Matrix>::size_type nrows,ncols;
+		typename smatrix_traits<Matrix>::size_type nrows,ncols;
 		
 		boost::tie(nrows, ncols) = dimensions(m);
 		
@@ -221,3 +221,4 @@ namespace yasmic
 }
 
 #endif // YASMIC_GENERIC_MATRIX_OPERATIONS
+
