@@ -15,6 +15,10 @@ namespace yasmic
 	template <class Index, class Value, class NonzeroIndex>
 	struct simple_nonzero
 	{
+		simple_nonzero()
+			: _row(0), _column(0), _val(0), _nzi(0)
+		{}
+
 		simple_nonzero(Index row, Index col, Value val, NonzeroIndex nzi)
 			: _row(row), _column(col), _val(val), _nzi(nzi)
 		{}

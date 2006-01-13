@@ -36,7 +36,7 @@ namespace boost
 			typedef yasmic::smatrix_traits<type> traits;
 		};
 
-		template <class RowIter, class ColIter, class ValIter>
+		/*template <class RowIter, class ColIter, class ValIter>
 		struct nonzero_to_edge_transform
 		{
 			typedef
@@ -49,7 +49,7 @@ namespace boost
 			{
 				return (result_type(arg._row, arg._column, arg._nzi));
 			}
-		};
+		};*/
 
 		template <class RowIter, class ColIter, class ValIter>
 		struct nonzero_to_adjacency_transform
@@ -73,7 +73,9 @@ namespace boost
 		typedef yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> smatrix_type; 
 
 		typedef typename yasmic::smatrix_traits<smatrix_type>::index_type vertex_descriptor;
-		typedef typename impl::crm_graph_edge<RowIter, ColIter, ValIter>::type edge_descriptor;
+		typedef typename yasmic::smatrix_traits<smatrix_type>::row_nonzero_descriptor edge_descriptor;
+
+		//typedef typename impl::crm_graph_edge<RowIter, ColIter, ValIter>::type edge_descriptor;
 
 
 		
@@ -90,10 +92,13 @@ namespace boost
 				typename yasmic::smatrix_traits<smatrix_type>::row_nonzero_iterator > 
 			adjacency_iterator;
 
-		typedef 
+		/*typedef 
 			boost::transform_iterator< 
 				impl::nonzero_to_edge_transform<RowIter, ColIter, ValIter>,
 				typename yasmic::smatrix_traits<smatrix_type>::row_nonzero_iterator > 
+			out_edge_iterator;*/
+
+		typedef typename yasmic::smatrix_traits<smatrix_type>::row_nonzero_iterator
 			out_edge_iterator;
 
 		
@@ -252,18 +257,39 @@ namespace boost
 	}  
 
 	template <class RowIter, class ColIter, class ValIter>
-	typename boost::graph_traits< yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> >::vertices_size_type
-	inline num_edges(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+	inline typename boost::graph_traits< yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> >::vertices_size_type
+		num_edges(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
 	{
 		return nnz(g);
 	}  
+
+	template <class RowIter, class ColIter, class ValIter>
+	inline typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor
+	source(
+		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::edge_descriptor e,
+		const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+	{
+		return (e._row);
+	}
+
+	template <class RowIter, class ColIter, class ValIter>
+	inline typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor
+	target(
+		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::edge_descriptor e,
+		const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+	{
+		return (e._column);
+	}
+
 
 	template <class RowIter, class ColIter, class ValIter>
 	inline typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::out_edges_ret
 		out_edges(typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor v,
 			  const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
 	{
-		typedef typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::out_edge_iterator Iter;
+		return (row_nonzeros(v,g));
+
+		/*typedef typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::out_edge_iterator Iter;
 		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::out_edges_ret return_type;
 
 		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::smatrix_traits::row_nonzero_iterator rnzi, rnziend;
@@ -272,7 +298,7 @@ namespace boost
 
 		typedef typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::out_edge_iterator iter;
 
-		return std::make_pair(iter(rnzi), iter(rnziend));
+		return std::make_pair(iter(rnzi), iter(rnziend));*/
 
 
 		/*typedef typename detail::val_out_edge_iter<EdgeList>::type Iter;
@@ -336,11 +362,12 @@ namespace boost
   		typedef readable_property_map_tag category;
   		typedef S value_type;
   		typedef S reference;
-		typedef typename impl::crm_graph_edge<RowIter, ColIter, ValIter>::type key_type;
+		typedef typename graph_traits< typename impl::crm_graph<RowIter, ColIter, ValIter>::type >::edge_descriptor key_type;
+		//typedef typename impl::crm_graph_edge<RowIter, ColIter, ValIter>::type key_type;
   		//typedef typename detail::crm_graph_edge<RowIter, ColIter, ValIter>::type key_type;
 	  	
   		compressed_row_matrix_graph_id_map() { }
-  		template <class T> S operator [] (T x) const { return x.id(); }
+  		template <class T> S operator [] (T x) const { return x._nzi; }
 	};
 
 

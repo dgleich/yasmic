@@ -191,7 +191,7 @@ namespace yasmic
 
             friend class boost::iterator_core_access;
 
-			inline void increment() 
+			void increment() 
             {
 				++_nzi;
 				++_ci;
