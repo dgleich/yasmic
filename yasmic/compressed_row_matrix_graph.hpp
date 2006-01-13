@@ -36,7 +36,7 @@ namespace boost
 			typedef yasmic::smatrix_traits<type> traits;
 		};
 
-		/*template <class RowIter, class ColIter, class ValIter>
+		template <class RowIter, class ColIter, class ValIter>
 		struct nonzero_to_edge_transform
 		{
 			typedef
@@ -49,7 +49,7 @@ namespace boost
 			{
 				return (result_type(arg._row, arg._column, arg._nzi));
 			}
-		};*/
+		};
 
 		template <class RowIter, class ColIter, class ValIter>
 		struct nonzero_to_adjacency_transform
