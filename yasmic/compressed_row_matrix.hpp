@@ -6,6 +6,9 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
+#include <boost/tuple/tuple.hpp>
+#include <boost/iterator/zip_iterator.hpp>
+
 #include <boost/functional.hpp>
 
 #include <yasmic/tuple_utility.hpp>
@@ -64,7 +67,7 @@ namespace yasmic
         private:
             friend class boost::iterator_core_access;
 
-            void increment() 
+            inline void increment() 
             {  
             	// just increment everything!
             	++_ci; ++_vi; ++_id;
@@ -86,8 +89,6 @@ namespace yasmic
             
             bool equal(compressed_row_nonzero_const_iterator const& other) const
             {
-
-
 				return (_ri == other._ri && _ci == other._ci);
             }
 
@@ -110,6 +111,115 @@ namespace yasmic
             ColIter _ci;
             ValIter _vi;
         };
+
+		/*template <class IndexType, class ValType, class NzIndexType>
+		struct zip_tuple_to_row_nonzero
+		{
+			typedef typename yasmic::simple_nonzero<IndexType, ValType, NzIndexType> result_type;
+			typedef boost::tuple<IndexType, ValType, NzIndexType> argument_type;
+
+			// default required for transform_iterator
+			zip_tuple_to_row_nonzero()
+				: _r(0)
+			{}
+
+			zip_tuple_to_row_nonzero(IndexType r)
+				: _r(r)
+			{}
+
+			IndexType _r;
+			//NzIndexType _nzi;
+
+			result_type operator() (argument_type arg) const
+			{
+				return make_simple_nonzero(
+					_r,
+					arg.get<0>(),
+					arg.get<1>(),
+					arg.get<2>());
+			}
+		};
+
+		template <class RowIter, class ColIter, class ValIter>
+		struct crm_row_nonzero_iter_help
+		{
+			typedef boost::counting_iterator<
+				typename std::iterator_traits<RowIter>::value_type > nz_index_iter;
+
+			typedef boost::tuple<ColIter, ValIter, nz_index_iter> row_nonzero_iter_tuple;
+
+			typedef boost::zip_iterator<row_nonzero_iter_tuple> row_nonzero_zip_iter;
+
+			typedef zip_tuple_to_row_nonzero<
+					typename std::iterator_traits<RowIter>::value_type,
+					typename std::iterator_traits<ValIter>::value_type,
+					typename std::iterator_traits<RowIter>::value_type> tuple_xform_func;
+
+			typedef boost::transform_iterator<
+				tuple_xform_func, row_nonzero_zip_iter> row_iter;
+		};*/
+
+		
+		template <class IndexType, class ColIter, class ValIter>
+		class crm_row_nonzero_const_iterator
+		: public boost::iterator_facade<
+            crm_row_nonzero_const_iterator<IndexType, ColIter, ValIter>,
+			yasmic::simple_nonzero<
+				typename std::iterator_traits<ColIter>::value_type,
+				typename std::iterator_traits<ValIter>::value_type,
+				IndexType> const,
+            boost::forward_traversal_tag, 
+            yasmic::simple_nonzero<
+				typename std::iterator_traits<ColIter>::value_type,
+				typename std::iterator_traits<ValIter>::value_type,
+				IndexType> const >
+		{
+		public:
+			crm_row_nonzero_const_iterator() {}
+            
+            crm_row_nonzero_const_iterator(
+                IndexType r, IndexType nzi, ColIter ci, ValIter vi)
+            :  _r(r), _nzi(nzi), _ci(ci), _vi(vi)
+            {}
+
+
+		private:
+			IndexType _r;
+			IndexType _nzi;
+			ColIter _ci;
+			ValIter _vi;
+
+            friend class boost::iterator_core_access;
+
+			inline void increment() 
+            {
+				++_nzi;
+				++_ci;
+				++_vi;
+			}
+
+			bool equal(crm_row_nonzero_const_iterator const& other) const
+			{
+				return (_ci == other._ci);
+			}
+
+			yasmic::simple_nonzero<
+				typename std::iterator_traits<ColIter>::value_type,
+				typename std::iterator_traits<ValIter>::value_type,
+				IndexType>
+            dereference() const 
+			{
+				return (make_simple_nonzero(_r, *_ci, *_vi, _nzi));
+			}
+		};
+
+		template <class RowIter, class ColIter, class ValIter>
+		struct crm_row_nonzero_iter_help
+		{
+			typedef crm_row_nonzero_const_iterator<
+				typename std::iterator_traits<RowIter>::value_type,
+				ColIter, ValIter> row_iter;
+		};
 	}
 	
 	template <class RowIter, class ColIter, class ValIter>
@@ -133,8 +243,11 @@ namespace yasmic
 		typedef boost::counting_iterator<size_type> row_iterator;
 
 		typedef nonzero_descriptor row_nonzero_descriptor;
-		typedef impl::compressed_row_nonzero_const_iterator<RowIter, ColIter, ValIter>
-             row_nonzero_iterator;
+		/*typedef impl::compressed_row_nonzero_const_iterator<RowIter, ColIter, ValIter>
+             row_nonzero_iterator;*/
+
+		typedef typename impl::crm_row_nonzero_iter_help<RowIter, ColIter, ValIter>::row_iter
+			row_nonzero_iterator;
 
 		typedef ValIter value_iterator;
 		
@@ -212,8 +325,58 @@ namespace yasmic
         {
         	return (row_iterator(_nrows));
         }
+
+		row_nonzero_iterator begin_row(index_type r) const
+		{
+			index_type nzi = *(_rstart + (r));
+			return (row_nonzero_iterator(r, nzi, _cstart + nzi, _vstart + nzi));
+
+			//typedef impl::crm_row_nonzero_iter_help<RowIter, ColIter, ValIter> type_helper;
+
+			/*typedef typename type_helper::nz_index_iter nzi_iter;
+			typedef typename type_helper::row_nonzero_iter_tuple iter_tuple;
+			typedef typename type_helper::row_nonzero_zip_iter row_zip_iterator;
+			typedef typename type_helper::tuple_xform_func zip_xform;
+
+			return (row_nonzero_iterator(
+						row_zip_iterator(
+							iter_tuple(_cstart + *(_rstart + r),
+									   _vstart + *(_rstart + r),
+									   nzi_iter(*(_rstart + r)))
+									   ),
+					   zip_xform(r)));*/
+
+			/*return (row_nonzero_iterator(
+						row_zip_iterator(
+							iter_tuple(_cstart + *(_rstart + r),
+									   _vstart + *(_rstart + r))
+									   ),
+					   zip_xform(r, *(_rstart + (r)))));*/
+		}
+										
+							
+		row_nonzero_iterator end_row(index_type r) const
+        {
+			index_type nzi = *(_rstart + (r+1));
+			return (row_nonzero_iterator(r, nzi, _cstart + nzi, _vstart + nzi));
+
+			/*typedef impl::crm_row_nonzero_iter_help<RowIter, ColIter, ValIter> type_helper;
+
+			typedef typename type_helper::nz_index_iter nzi_iter;
+			typedef typename type_helper::row_nonzero_iter_tuple iter_tuple;
+			typedef typename type_helper::row_nonzero_zip_iter row_zip_iterator;
+			typedef typename type_helper::tuple_xform_func zip_xform;
+
+			return (row_nonzero_iterator(
+						row_zip_iterator(
+							iter_tuple(_cstart + *(_rstart + (r+1)),
+									   _vstart + *(_rstart + (r+1)),
+									   nzi_iter(*(_rstart + (r+1))))
+									   ),
+					   zip_xform(r)));*/
+		}
         
-        row_nonzero_iterator begin_row(index_type r) const
+        /*row_nonzero_iterator begin_row(index_type r) const
         {
 			return (row_nonzero_iterator(
                 _rstart + r, _rstart + r+1, _cstart + *(_rstart + r), 
@@ -225,7 +388,7 @@ namespace yasmic
 			return (row_nonzero_iterator(
                 _rstart + r, _rstart + r+1, _cstart + *(_rstart + (r+1) ), 
                 _vstart + *(_rstart + r), *(_rstart+(r+1)), r ) );
-        }
+        }*/
 
 		value_iterator begin_values() const
 		{

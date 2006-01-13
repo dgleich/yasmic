@@ -25,6 +25,13 @@
 
 #include <boost/timer.hpp>
 
+/*
+#include <boost/graph/detail/adjacency_list.hpp>
+#include <boost/graph/properties.hpp>
+#include <boost/graph/detail/edge.hpp>
+*/
+/*
+*/
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/strong_components.hpp>
 
@@ -110,7 +117,6 @@ int main(int argc, char **argv)
 	t0.restart();
 
     typedef adjacency_list<vecS, vecS, directedS> Graph;
-    typedef graph_traits<Graph>::vertex_descriptor Vertex;
 
     Graph g(nrows(crm));
 
@@ -121,10 +127,6 @@ int main(int argc, char **argv)
 	    	
     	for (; nzi != nzend; ++nzi)
     	{
-			/*if (row(*nzi, crm) > column(*nzi, crm))
-			{
-				add_edge(row(*nzi, crm), column(*nzi, crm), g);
-			}*/
 			add_edge(row(*nzi, crm), column(*nzi, crm), g);
     	}
 	}
@@ -138,8 +140,7 @@ int main(int argc, char **argv)
 		vector<int> component_map(num_vertices(g));
 		// compute connected components
 		num_components = strong_components(g, 
-			make_iterator_property_map(component_map.begin(), 
-			get(vertex_index, crm)));
+			make_iterator_property_map(component_map.begin(), get(vertex_index, g)));
 	}
 
 	cout << "connected components time: " << t0.elapsed() << " seconds" << endl;

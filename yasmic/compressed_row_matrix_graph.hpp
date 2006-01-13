@@ -36,7 +36,7 @@ namespace boost
 			typedef yasmic::smatrix_traits<type> traits;
 		};
 
-		template <class RowIter, class ColIter, class ValIter>
+		/*template <class RowIter, class ColIter, class ValIter>
 		struct nonzero_to_edge_transform
 		{
 			typedef
@@ -49,7 +49,7 @@ namespace boost
 			{
 				return (result_type(arg._row, arg._column, arg._nzi));
 			}
-		};
+		};*/
 
 		template <class RowIter, class ColIter, class ValIter>
 		struct nonzero_to_adjacency_transform
@@ -245,22 +245,22 @@ namespace boost
 	}
 
 	template <class RowIter, class ColIter, class ValIter>
-	typename boost::graph_traits< yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> >::vertices_size_type
-	num_vertices(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g) 
+	inline typename boost::graph_traits< yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> >::vertices_size_type
+		num_vertices(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g) 
 	{
 		return nrows(g);
 	}  
 
 	template <class RowIter, class ColIter, class ValIter>
 	typename boost::graph_traits< yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> >::vertices_size_type
-	num_edges(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+	inline num_edges(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
 	{
 		return nnz(g);
 	}  
 
 	template <class RowIter, class ColIter, class ValIter>
-	typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::out_edges_ret
-	out_edges(typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor v,
+	inline typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::out_edges_ret
+		out_edges(typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor v,
 			  const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
 	{
 		typedef typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::out_edge_iterator Iter;
@@ -298,7 +298,7 @@ namespace boost
 	}
 
 	template <class RowIter, class ColIter, class ValIter>
-	typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::adjacent_ret 
+	inline typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::adjacent_ret 
 		adjacent_vertices(
 			typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor v,
 			const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
@@ -315,8 +315,8 @@ namespace boost
 	// source() and target() already provided for pairs in graph_traits.hpp
 
 	template <class RowIter, class ColIter, class ValIter>
-	typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::vertices_ret 
-	vertices(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+	inline typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::vertices_ret 
+		vertices(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
 	{
 		//typedef typename boost::integer_range<typename EdgeList::value_type>
 		//::iterator Iter;
