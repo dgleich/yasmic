@@ -23,6 +23,8 @@
 #include <yasmic/compressed_row_matrix.hpp>
 #include <yasmic/compressed_row_matrix_graph.hpp>
 
+#include <yasmic/iterator_utility.hpp>
+
 #include <boost/timer.hpp>
 
 /*
@@ -30,6 +32,7 @@
 #include <boost/graph/properties.hpp>
 #include <boost/graph/detail/edge.hpp>
 */
+
 /*
 */
 #include <boost/graph/adjacency_list.hpp>
@@ -57,9 +60,11 @@ int main(int argc, char **argv)
     
     typedef ifstream simple_matrix;
     typedef smatrix_traits<simple_matrix>::size_type size_type;
+
+	
     
     typedef compressed_row_matrix<
-        vector<int>::iterator, vector<int>::iterator, vector<double>::iterator >
+        vector<int>::iterator, vector<int>::iterator, counting_iterator<int>  >
         crs_matrix;       
     
     ifstream m(filename.c_str());
@@ -92,9 +97,12 @@ int main(int argc, char **argv)
             cur[row(*nzi, m)]++;
     	}
     }
-     
+
+	//constant_iterator<double>  cvals(1.0), cvals_end(1.0, nnz(m)-1);
+    counting_iterator<int> cvals(0), cvals_end(nnz(m)-1);
+
     crs_matrix crm(rows.begin(), rows.end(), cols.begin(), cols.end(),
-            vals.begin(), vals.end(), nr, nc, nnz(m));
+            cvals, cvals_end, nr, nc, nnz(m));
 
 	cout << "matrix load time: " << t0.elapsed() << " seconds" << endl;
 
