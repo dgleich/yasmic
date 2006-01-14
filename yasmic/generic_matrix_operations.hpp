@@ -27,6 +27,16 @@ namespace yasmic
 		Index _column;
 		Value _val;
 		NonzeroIndex _nzi;
+		
+		bool operator!= (const simple_nonzero& other)
+		{
+			return (_row != other._row || _column || other._column && _val || other._val && _nzi || other._nzi);
+		}
+		
+		bool operator== (const simple_nonzero& other)
+		{
+			return (_row == other._row && _column == other._column && _val == other._val && _nzi == other._nzi);
+		}
 
 		typedef Index index_type;
 		typedef Value value_type;
