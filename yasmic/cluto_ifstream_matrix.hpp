@@ -41,6 +41,7 @@ namespace yasmic
             {
 				std::string curline;
 				getline( *(_str), curline );
+				getline( *(_str), curline );
 				_line->str(curline);
 
 				increment(); 
@@ -54,10 +55,15 @@ namespace yasmic
             {  
 				if (_str != 0)
 				{
-					if (!_line)
+					while (_line->eof())
 					{
+						// I don't like the early return here, but 
+						// I don't know what to do about it...
+						if (_str->eof()) { _str = 0; return; }
+
 						std::string curline;
 						getline( *(_str), curline );
+						_line->clear();
 						_line->str(curline);
 
 						++_r;
@@ -65,8 +71,6 @@ namespace yasmic
 
 					*(_line) >> _c;
 					*(_line) >> _v;
-
-					if (_str->eof()) { _str = 0; }
 				}
             }
             
@@ -150,6 +154,7 @@ namespace yasmic
 		
 		// clear any error bits
 		m._f.clear();
+		m._f.seekg(0, std::ios_base::beg);
 
 		m._f >> d1 >> d2 >> nnz;
 		
@@ -170,6 +175,7 @@ namespace yasmic
     	typename traits::size_type d1, d2, d3;
 
     	m._f.clear();
+		m._f.seekg(0, std::ios_base::beg);
 
 		m._f >> d1 >> d2 >> d3;
 
