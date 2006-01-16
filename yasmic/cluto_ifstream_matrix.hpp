@@ -33,15 +33,15 @@ namespace yasmic
         {
         public:
             cluto_ifstream_matrix_const_iterator() 
-				: _str(0), _r(0), _c(0), _v(0), _line("")
+				: _str(0), _r(0), _c(0), _v(0), _line(0)
 			{}
             
-            cluto_ifstream_matrix_const_iterator(std::ifstream &str)
-				: _str(&str), _r(0), _c(0), _v(0), _line("")
+            cluto_ifstream_matrix_const_iterator(std::ifstream &str, std::istringstream &line)
+				: _str(&str), _r(0), _c(0), _v(0), _line(&line)
             {
 				std::string curline;
-				//getline( *(_str), curline );
-				_line.str(curline);
+				getline( *(_str), curline );
+				_line->str(curline);
 
 				increment(); 
 			}
@@ -57,14 +57,14 @@ namespace yasmic
 					if (!_line)
 					{
 						std::string curline;
-						//getline( *(_str), curline );
-						_line.str(curline);
+						getline( *(_str), curline );
+						_line->str(curline);
 
 						++_r;
 					}
 
-					_line >> _c;
-					_line >> _v;
+					*(_line) >> _c;
+					*(_line) >> _v;
 
 					if (_str->eof()) { _str = 0; }
 				}
@@ -85,7 +85,7 @@ namespace yasmic
 			i_index_type _r, _c;
 			i_value_type _v;
 
-			std::istringstream _line;
+			std::istringstream* _line;
 
 			std::ifstream* _str;
         };
@@ -97,6 +97,7 @@ namespace yasmic
 	struct cluto_ifstream_matrix
 	{
 		std::ifstream& _f;
+		std::istringstream _line;
 
 		cluto_ifstream_matrix(std::ifstream& f)
 			: _f(f) 
@@ -130,7 +131,7 @@ namespace yasmic
     dimensions(cluto_ifstream_matrix<i_index_type, i_value_type, i_size_type>& m)
     {
 		typedef smatrix_traits<cluto_ifstream_matrix<i_index_type, i_value_type, i_size_type> > traits;
-    	traits::size_type nrows,ncols;
+    	typename traits::size_type nrows,ncols;
     	
     	m._f.clear();
     	m._f.seekg(0, std::ios_base::beg);
@@ -145,7 +146,7 @@ namespace yasmic
 	nnz(cluto_ifstream_matrix<i_index_type, i_value_type, i_size_type>& m)
 	{
 		typedef smatrix_traits<cluto_ifstream_matrix<i_index_type, i_value_type, i_size_type> > traits;
-    	traits::size_type d1, d2, nnz;
+    	typename traits::size_type d1, d2, nnz;
 		
 		// clear any error bits
 		m._f.clear();
@@ -166,7 +167,7 @@ namespace yasmic
     nonzeros(cluto_ifstream_matrix<i_index_type, i_value_type, i_size_type>& m)
     {
     	typedef smatrix_traits<cluto_ifstream_matrix<i_index_type, i_value_type, i_size_type> > traits;
-    	traits::size_type d1, d2, d3;
+    	typename traits::size_type d1, d2, d3;
 
     	m._f.clear();
 
@@ -177,7 +178,7 @@ namespace yasmic
         
         typedef typename traits::nonzero_iterator nz_iter;
         
-        return (std::make_pair(nz_iter(m._f), nz_iter()));
+        return (std::make_pair(nz_iter(m._f, m._line), nz_iter()));
     }
 }
 

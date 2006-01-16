@@ -48,7 +48,7 @@ namespace yasmic
     dimensions(ifstream_matrix<i_index_type, i_value_type, i_size_type>& m)
     {
 		typedef smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> > traits;
-    	traits::size_type nrows,ncols;
+    	typename traits::size_type nrows,ncols;
     	
     	m._f.clear();
     	m._f.seekg(0, std::ios_base::beg);
@@ -63,7 +63,7 @@ namespace yasmic
 	nnz(ifstream_matrix<i_index_type, i_value_type, i_size_type>& m)
 	{
 		typedef smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> > traits;
-    	traits::size_type d1,d2,nnz;
+    	typename traits::size_type d1,d2,nnz;
 		
 		// clear any error bits
 		m._f.clear();

@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 		{
     		smatrix_traits<cluto_matrix>::nonzero_iterator nzi, nzend;
 	    
-    		tie(nzi, nzend) = nonzeros(m2);
+    		tie(nzi, nzend) = nonzeros(m3);
 	    	
     		for (; nzi != nzend; ++nzi)
     		{
@@ -118,3 +118,5 @@ int main(int argc, char **argv)
     
     return (0);
 }
+
+
