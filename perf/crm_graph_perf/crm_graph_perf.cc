@@ -19,7 +19,9 @@
 
 #include <numeric>
 
-#include <yasmic/ifstream_as_matrix.hpp>
+//#include <yasmic/ifstream_as_matrix.hpp>
+#include <yasmic/ifstream_matrix.hpp>
+#include <yasmic/binary_ifstream_matrix.hpp>
 #include <yasmic/compressed_row_matrix.hpp>
 #include <yasmic/compressed_row_matrix_graph.hpp>
 
@@ -58,16 +60,23 @@ int main(int argc, char **argv)
 
 	boost::timer t0;
     
-    typedef ifstream simple_matrix;
+    typedef binary_ifstream_matrix<> simple_matrix;
     typedef smatrix_traits<simple_matrix>::size_type size_type;
 
 	
     
-    typedef compressed_row_matrix<
+    /*typedef compressed_row_matrix<
+        vector<int>::iterator, vector<int>::iterator, constant_iterator<double>  >
+        crs_matrix;       */
+	/*typedef compressed_row_matrix<
         vector<int>::iterator, vector<int>::iterator, counting_iterator<int>  >
-        crs_matrix;       
+        crs_matrix;*/       
+	typedef compressed_row_matrix<
+        vector<int>::iterator, vector<int>::iterator, constant_iterator<double> >
+        crs_matrix;
     
-    ifstream m(filename.c_str());
+    ifstream fs(filename.c_str(), ios::binary);
+	simple_matrix m(fs);
     
     size_type nr = nrows(m);
     size_type nc = ncols(m);
@@ -78,12 +87,13 @@ int main(int argc, char **argv)
     
     {
     	vector<int> cur(nr);
+		size_type nzcount = 0;
     	
     	smatrix_traits<simple_matrix>::nonzero_iterator nzi, nzend;
     	tie(nzi, nzend) = nonzeros(m);
     	for (; nzi != nzend; ++nzi)
     	{
-            rows[row(*nzi, m)+1]++;
+            ++rows[row(*nzi, m)+1];
     	}
     	
     	// compute the reduction
@@ -94,12 +104,16 @@ int main(int argc, char **argv)
     	{
             cols[rows[row(*nzi, m)]+cur[row(*nzi, m)]] = column(*nzi, m);
             vals[rows[row(*nzi, m)]+cur[row(*nzi, m)]] = value(*nzi, m);
-            cur[row(*nzi, m)]++;
+            ++cur[row(*nzi, m)];
     	}
     }
 
+
+	double val = 1.0;
+	constant_iterator<double>  cvals(&val), cvals_end(&val);
 	//constant_iterator<double>  cvals(1.0), cvals_end(1.0, nnz(m)-1);
-    counting_iterator<int> cvals(0), cvals_end(nnz(m)-1);
+    //counting_iterator<int> cvals(0), cvals_end(nnz(m)-1);
+	//double *cvals = NULL, *cvals_end = (double*)(NULL+nnz(m)-1);
 
     crs_matrix crm(rows.begin(), rows.end(), cols.begin(), cols.end(),
             cvals, cvals_end, nr, nc, nnz(m));
