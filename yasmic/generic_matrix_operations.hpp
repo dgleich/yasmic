@@ -230,7 +230,10 @@ namespace yasmic
                       typename smatrix_traits<Matrix>::row_nonzero_iterator>
     row_nonzeros(typename smatrix_traits<Matrix>::index_type r, const Matrix& m)
     {
-    	return (make_pair(m.begin_row(r), m.end_row(r)));
+		typename smatrix_traits<Matrix>::row_nonzero_iterator br = m.begin_row(r);
+		typename smatrix_traits<Matrix>::row_nonzero_iterator be = m.end_row(r);
+		return make_pair(br, be);
+    	//return (make_pair(m.begin_row(r), m.end_row(r)));
     }
 }
 

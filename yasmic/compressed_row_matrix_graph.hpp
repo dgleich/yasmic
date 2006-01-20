@@ -74,17 +74,6 @@ namespace boost
 
 		typedef typename yasmic::smatrix_traits<smatrix_type>::index_type vertex_descriptor;
 		typedef typename yasmic::smatrix_traits<smatrix_type>::row_nonzero_descriptor edge_descriptor;
-
-		//typedef typename impl::crm_graph_edge<RowIter, ColIter, ValIter>::type edge_descriptor;
-
-
-		
-		/*typedef 
-			yasmic::tuple_get_fn<0, 
-				typename yasmic::smatrix_traits<smatrix_type>::row_nonzero_descriptor> 
-            nonzero_to_adjacency_transform;*/
-
-		
 		
 		typedef 
 			boost::transform_iterator< 
@@ -92,31 +81,13 @@ namespace boost
 				typename yasmic::smatrix_traits<smatrix_type>::row_nonzero_iterator > 
 			adjacency_iterator;
 
-		/*typedef 
-			boost::transform_iterator< 
-				impl::nonzero_to_edge_transform<RowIter, ColIter, ValIter>,
-				typename yasmic::smatrix_traits<smatrix_type>::row_nonzero_iterator > 
-			out_edge_iterator;*/
-
 		typedef typename yasmic::smatrix_traits<smatrix_type>::row_nonzero_iterator
 			out_edge_iterator;
-
 		
 		typedef void in_edge_iterator;
     
 		typedef typename yasmic::smatrix_traits<smatrix_type>::row_iterator vertex_iterator;
     
-		//
-		// we need a new type here, sadly we can't just wrap the nonzero_iterator because
-		// that doesn't return the 
-		// id we need for an index into the property
-		// array
-		//
-
-		/*typedef impl::crm_graph_edge_iter<RowIter, ColIter, ValIter>
-    		edge_iterator;*/
-
-	
 		typedef out_edge_iterator edge_iterator;
 		
 	

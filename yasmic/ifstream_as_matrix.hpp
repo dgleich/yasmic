@@ -28,7 +28,6 @@ namespace yasmic
 		typedef void row_nonzero_iterator;
 		
 		typedef void column_iterator;
-
     };
     
     inline std::pair<smatrix_traits<std::ifstream>::size_type,

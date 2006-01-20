@@ -14,9 +14,9 @@ namespace yasmic
 	template <class index_type = int, class value_type = double, class size_type = unsigned int>
 	struct ifstream_matrix
 	{
-		std::ifstream& _f;
+		std::istream& _f;
 
-		ifstream_matrix(std::ifstream& f)
+		ifstream_matrix(std::istream& f)
 			: _f(f) 
 		{}
 	};

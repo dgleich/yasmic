@@ -101,7 +101,7 @@ namespace yasmic
             dereference() const 
             { 
             	//return boost::make_tuple(_row, *_ci, *_vi);
-				return make_simple_nonzero(_row, *_ci, *_vi, _id);
+				return make_simple_nonzero(_row, *_ci, 1.0/**_vi*/, _id);
             }
 
 
