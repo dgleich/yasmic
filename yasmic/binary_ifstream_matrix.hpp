@@ -76,7 +76,7 @@ namespace yasmic
 	}
 
 
-	template <class index_type = int, class value_type = double, class size_type = unsigned int>
+	template <class index_type = int, class value_type = double, class size_type = int>
 	struct binary_ifstream_matrix
 	{
 		std::ifstream& _f;
