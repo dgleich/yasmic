@@ -88,7 +88,7 @@ namespace boost
     
 		typedef typename yasmic::smatrix_traits<smatrix_type>::row_iterator vertex_iterator;
     
-		typedef out_edge_iterator edge_iterator;
+		typedef typename yasmic::smatrix_traits<smatrix_type>::nonzero_iterator edge_iterator;
 		
 	
 		typedef directed_tag directed_category;
@@ -217,6 +217,9 @@ namespace boost
 
 			typedef std::pair < typename g_traits::out_edge_iterator, typename g_traits::out_edge_iterator >
 				out_edges_ret;
+
+			typedef std::pair < typename g_traits::edge_iterator, typename g_traits::edge_iterator >
+				edges_ret;
 		};
 	}
 
@@ -319,6 +322,18 @@ namespace boost
 		//::iterator Iter;
 		typedef typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_iterator iter;
 		return std::make_pair(iter(0), iter(nrows(g)));
+	}
+
+	template <class RowIter, class ColIter, class ValIter>
+	inline typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::edges_ret 
+		edges(const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
+	{
+		//typedef typename boost::integer_range<typename EdgeList::value_type>
+		//::iterator Iter;
+		//typedef typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_iterator iter;
+		//return std::make_pair(iter(0), iter(nrows(g)));
+
+		return (nonzeros(g));
 	}
 
 	template <class RowIter, class ColIter, class ValIter>
