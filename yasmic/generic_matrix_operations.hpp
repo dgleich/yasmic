@@ -222,7 +222,7 @@ namespace yasmic
                       typename smatrix_traits<Matrix>::nonzero_iterator>
     nonzeros(Matrix& m)
     {
-    	return (make_pair(m.begin_nonzeros(), m.end_nonzeros()));
+		return (std::make_pair(m.begin_nonzeros(), m.end_nonzeros()));
     }
     
     template <class Matrix>
@@ -232,7 +232,7 @@ namespace yasmic
     {
 		typename smatrix_traits<Matrix>::row_nonzero_iterator br = m.begin_row(r);
 		typename smatrix_traits<Matrix>::row_nonzero_iterator be = m.end_row(r);
-		return make_pair(br, be);
+		return std::make_pair(br, be);
     	//return (make_pair(m.begin_row(r), m.end_row(r)));
     }
 }

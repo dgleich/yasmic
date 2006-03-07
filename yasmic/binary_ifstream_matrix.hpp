@@ -105,6 +105,8 @@ namespace yasmic
 		typedef void row_nonzero_iterator;
 		
 		typedef void column_iterator;
+
+		typedef unsymmetric_tag symmetry_category;
     };
     
 	template <class i_index_type, class i_value_type, class i_size_type>

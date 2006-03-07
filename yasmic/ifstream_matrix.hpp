@@ -4,6 +4,7 @@
 #include <fstream>
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_io.hpp> 
+#include <boost/static_assert.hpp>
 #include <yasmic/smatrix_traits.hpp>
 #include <iterator>
 
@@ -11,18 +12,31 @@
 
 namespace yasmic
 {
-	template <class index_type = int, class value_type = double, class size_type = int>
+	template <class index_type = int, class value_type = double, class size_type = int,
+		bool header = true>
 	struct ifstream_matrix
 	{
-		std::istream& _f;
-
 		ifstream_matrix(std::istream& f)
-			: _f(f) 
+			: _f(f), _nrows(0), _ncols(0), _nnz(0), _sized(false) 
+		{
+			// this call is only valid if we have to read the header
+			BOOST_STATIC_ASSERT(header == true);
+		}
+
+		ifstream_matrix(std::istream& f, index_type nrows, index_type ncols, size_type nnz)
+			: _f(f), _nrows(nrows), _ncols(ncols), _nnz(nnz), _sized(true)
 		{}
+
+		std::istream& _f;
+		size_type _nrows;
+		size_type _ncols;
+		size_type _nnz;
+
+		bool _sized;
 	};
 
-	template <class i_index_type, class i_value_type, class i_size_type>
-    struct smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> > 
+	template <class i_index_type, class i_value_type, class i_size_type, bool header>
+    struct smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type, header> > 
     {
     	typedef i_size_type size_type;
     	typedef i_index_type index_type;
@@ -40,58 +54,80 @@ namespace yasmic
 		typedef void row_nonzero_iterator;
 		
 		typedef void column_iterator;
+
+		typedef unsymmetric_tag symmetry_category;
     };
-    
-	template <class i_index_type, class i_value_type, class i_size_type>
-    inline std::pair<typename smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> >::size_type,
-                     typename smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> >::size_type >
-    dimensions(ifstream_matrix<i_index_type, i_value_type, i_size_type>& m)
-    {
-		typedef smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> > traits;
-    	typename traits::size_type nrows,ncols;
-    	
-    	m._f.clear();
-    	m._f.seekg(0, std::ios_base::beg);
-    	
-        m._f >> nrows >> ncols;
-        
-        return (std::make_pair(nrows, ncols));
-    }
-	
-	template <class i_index_type, class i_value_type, class i_size_type>
-	typename smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> >::size_type
-	nnz(ifstream_matrix<i_index_type, i_value_type, i_size_type>& m)
+
+	namespace impl
 	{
-		typedef smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> > traits;
-    	typename traits::size_type d1,d2,nnz;
-		
-		// clear any error bits
-		m._f.clear();
-        m._f.seekg(0, std::ios_base::beg);
-        
-        m._f >> d1 >> d2 >> nnz;
-        
-        return (nnz);
+		template <class i_index_type, class i_value_type, class i_size_type, bool header>
+		struct ifstream_matrix_help
+		{
+			typedef ifstream_matrix<i_index_type, i_value_type, i_size_type, header> mat_type;
+			typedef smatrix_traits<mat_type> mat_traits;
+			typedef std::pair<typename mat_traits::size_type, 
+							  typename mat_traits::size_type> dimensions_ret_type;
+			typedef std::pair<typename mat_traits::nonzero_iterator,
+							  typename mat_traits::nonzero_iterator> nz_ret_type;
+		};
+
 	}
 	
-	template <class i_index_type, class i_value_type, class i_size_type>
-	std::pair<typename smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> >::nonzero_iterator,
-              typename smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> >::nonzero_iterator>
-    nonzeros(ifstream_matrix<i_index_type, i_value_type, i_size_type>& m)
+    
+	template <class i_index_type, class i_value_type, class i_size_type, bool header>
+	inline typename
+		impl::ifstream_matrix_help<i_index_type, i_value_type, i_size_type, header>::dimensions_ret_type
+    dimensions(ifstream_matrix<i_index_type, i_value_type, i_size_type, header>& m)
+    {   	
+		if (header && !m._sized)
+		{
+			m._f.clear();
+    		m._f.seekg(0, std::ios_base::beg);
+    	
+			m._f >> m._nrows >> m._ncols >> m._nnz;
+			m._sized = true;
+		}
+    	
+        
+        return (std::make_pair(m._nrows, m._ncols));
+    }
+	
+	template <class i_index_type, class i_value_type, class i_size_type, bool header>
+	inline typename 
+		impl::ifstream_matrix_help<i_index_type, i_value_type, i_size_type, header>::mat_traits::size_type
+	nnz(ifstream_matrix<i_index_type, i_value_type, i_size_type, header>& m)
+	{		
+		if (header && !m._sized)
+		{
+			m._f.clear();
+    		m._f.seekg(0, std::ios_base::beg);
+    	
+			m._f >> m._nrows >> m._ncols >> m._nnz;
+			m._sized = true;
+		}
+        
+        return (m._nnz);
+	}
+	
+	template <class i_index_type, class i_value_type, class i_size_type, bool header>
+	inline typename
+		impl::ifstream_matrix_help<i_index_type, i_value_type, i_size_type, header>::nz_ret_type
+    nonzeros(ifstream_matrix<i_index_type, i_value_type, i_size_type, header>& m)
     {
-    	typedef smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type> > traits;
-    	typename traits::size_type d1,d2,d3;
+    	typedef smatrix_traits<ifstream_matrix<i_index_type, i_value_type, i_size_type, header> > traits;
     	
     	m._f.clear();
     	m._f.seekg(0, std::ios_base::beg);
     	
-        m._f >> d1  >> d2 >> d3;
+		if (header)
+		{
+    		typename traits::size_type d1,d2,d3;
+			m._f >> d1  >> d2 >> d3;
+		}
         
         m._f >> boost::tuples::set_open(' ') >> boost::tuples::set_close(' ');
         
         typedef typename traits::nonzero_iterator nz_iter;
-
-		
         
         return (std::make_pair(nz_iter(m._f), nz_iter()));
     }

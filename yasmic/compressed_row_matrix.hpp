@@ -253,6 +253,8 @@ namespace yasmic
 		
 		typedef void column_iterator;
 		typedef void column_nonzero_iterator;
+
+		typedef unsymmetric_tag symmetry_category;
 		
 		/**
 		 * Simple constructor for all the iterators.  This function
@@ -315,6 +317,8 @@ namespace yasmic
         {
         	return (_nnz);
         }
+
+		//inline size_type row_nnz(index_type r)
         	
         row_iterator begin_rows() const
         {
@@ -400,8 +404,10 @@ namespace yasmic
 			return (_vend);
 		}
 
+
+
 		
-    private:
+    
         RowIter _rstart,_rend;
         ColIter _cstart,_cend;
         ValIter _vstart,_vend;

@@ -177,11 +177,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\bgl_kcore.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\binary_ifstream_matrix.hpp"
 				>
 			</File>
 			<File
 				RelativePath=".\bind_utility.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cluto_ifstream_matrix.hpp"
 				>
 			</File>
 			<File
@@ -213,7 +221,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\iterator_utility.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\smatrix_traits.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\transpose_matrix.hpp"
 				>
 			</File>
 			<File

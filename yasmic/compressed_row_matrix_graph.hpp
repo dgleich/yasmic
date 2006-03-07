@@ -287,14 +287,18 @@ namespace boost
 		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor v,
 		const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)
 	{
-		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::smatrix_traits::row_nonzero_iterator rnzi, rnziend;
+		return (g._rstart[v+1] - g._rstart[v]);
+
+		/*typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::smatrix_traits::row_nonzero_iterator rnzi, rnziend;
 
 		tie(rnzi, rnziend) = yasmic::row_nonzeros(v, g);
 
 		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::smatrix_traits::size_type rval = 0;
 		while (rnzi != rnziend) { ++rnzi; ++rval; }
 
-		return (rval);
+		return (rval);*/
+
+
 	}
 
 	template <class RowIter, class ColIter, class ValIter>

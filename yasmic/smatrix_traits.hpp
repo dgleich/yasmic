@@ -12,6 +12,9 @@
 
 namespace yasmic
 {
+	struct unsymmetric_tag { };
+	struct symmetric_tag { };
+
 	template <class Op>
 	struct op_traits
 	{
@@ -36,6 +39,8 @@ namespace yasmic
 		
 		typedef typename Mat::column_iterator column_iterator;
 		//typedef typename Mat::column_nonzero_iterator column_nonzero_iterator;
+
+		typedef typename Mat::symmetry_category symmetry_category;
 	};
 }
 
