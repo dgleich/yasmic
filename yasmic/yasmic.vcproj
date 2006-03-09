@@ -5,7 +5,6 @@
 	Name="yasmic"
 	ProjectGUID="{0709DF5B-61F2-4AC8-A8D9-667493063EBC}"
 	RootNamespace="yasmic"
-	SignManifests="true"
 	>
 	<Platforms>
 		<Platform
@@ -222,6 +221,10 @@
 			</File>
 			<File
 				RelativePath=".\iterator_utility.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\nonzero_union.hpp"
 				>
 			</File>
 			<File

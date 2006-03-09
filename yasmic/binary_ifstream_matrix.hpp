@@ -84,6 +84,10 @@ namespace yasmic
 		binary_ifstream_matrix(std::ifstream& f)
 			: _f(f) 
 		{}
+
+		binary_ifstream_matrix(const binary_ifstream_matrix& bifm)
+			: _f(bifm._f)
+		{}
 	};
 
 	template <class i_index_type, class i_value_type, class i_size_type>

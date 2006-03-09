@@ -9,10 +9,11 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 
+#include <functional>
 #include <boost/functional.hpp>
 
 #include <yasmic/tuple_utility.hpp>
-
+#include <limits>
 
 #include <yasmic/generic_matrix_operations.hpp>
 
@@ -112,52 +113,7 @@ namespace yasmic
             ValIter _vi;
         };
 
-		/*template <class IndexType, class ValType, class NzIndexType>
-		struct zip_tuple_to_row_nonzero
-		{
-			typedef typename yasmic::simple_nonzero<IndexType, ValType, NzIndexType> result_type;
-			typedef boost::tuple<IndexType, ValType, NzIndexType> argument_type;
-
-			// default required for transform_iterator
-			zip_tuple_to_row_nonzero()
-				: _r(0)
-			{}
-
-			zip_tuple_to_row_nonzero(IndexType r)
-				: _r(r)
-			{}
-
-			IndexType _r;
-			//NzIndexType _nzi;
-
-			result_type operator() (argument_type arg) const
-			{
-				return make_simple_nonzero(
-					_r,
-					arg.get<0>(),
-					arg.get<1>(),
-					arg.get<2>());
-			}
-		};
-
-		template <class RowIter, class ColIter, class ValIter>
-		struct crm_row_nonzero_iter_help
-		{
-			typedef boost::counting_iterator<
-				typename std::iterator_traits<RowIter>::value_type > nz_index_iter;
-
-			typedef boost::tuple<ColIter, ValIter, nz_index_iter> row_nonzero_iter_tuple;
-
-			typedef boost::zip_iterator<row_nonzero_iter_tuple> row_nonzero_zip_iter;
-
-			typedef zip_tuple_to_row_nonzero<
-					typename std::iterator_traits<RowIter>::value_type,
-					typename std::iterator_traits<ValIter>::value_type,
-					typename std::iterator_traits<RowIter>::value_type> tuple_xform_func;
-
-			typedef boost::transform_iterator<
-				tuple_xform_func, row_nonzero_zip_iter> row_iter;
-		};*/
+		
 
 		
 		template <class IndexType, class ColIter, class ValIter>
@@ -404,16 +360,92 @@ namespace yasmic
 			return (_vend);
 		}
 
-
-
-		
-    
         RowIter _rstart,_rend;
         ColIter _cstart,_cend;
         ValIter _vstart,_vend;
         
         size_type _nrows, _ncols, _nnz;
 	};
+
+
+
+	template <class RowIter, class ColIter, class ValIter, class BFunc >
+	void pack_storage(compressed_row_matrix<RowIter, ColIter, ValIter>& m, BFunc b = BFunc())
+	{
+		// remove any duplicate entries.  This doesn't actually free any 
+		// memory, but reduces the non-zero count to the appropriate level
+		// for the matrix.
+
+		typedef compressed_row_matrix<RowIter, ColIter, ValIter> Matrix;
+		typedef smatrix_traits<Matrix> traits;
+
+		std::vector<typename traits::index_type> wa(ncols(m));
+
+		typename traits::nz_index_type cur_elem = 0;
+		
+		typename traits::index_type unused = std::numeric_limits<typename traits::index_type>::max();
+
+		std::fill(wa.begin(), wa.end(), unused);
+
+		RowIter ri, riend;
+		ri = m._rstart;
+		riend = m._rend-1;
+
+		ColIter ci = m._cstart;
+		ValIter vi = m._vstart;
+
+		for(; ri != riend; ++ri)
+		{
+			typename traits::nz_index_type pos_start = *ri;
+			typename traits::nz_index_type pos_end = *(ri+1);
+
+			*ri = cur_elem;
+
+			// 
+			// look at the elements in order
+			//
+	        
+			for (typename traits::nz_index_type k=pos_start; k<pos_end; k++)
+			{
+				// the column
+				typename traits::index_type c = ci[k]; 
+	            
+				if (wa[c] == unused)
+				{
+					// this is a new element
+					ci[cur_elem] = c;
+					vi[cur_elem] = vi[k];
+	                
+					wa[c] = cur_elem;
+	                
+					// now we've used this element...
+					cur_elem++;
+				}
+				else
+				{
+					// this is a duplicate element
+					//vi[wa[c]] += vi[k];
+					vi[wa[c]] = b(vi[wa[c]], vi[k]);
+				}
+			}
+	        
+			// reset just the entries we used (which are stored in the ci
+			// array)
+			for (typename traits::nz_index_type k=*ri; k < cur_elem; k++)
+			{
+				wa[ci[k]] = unused;
+			}
+
+		}
+
+		*ri = cur_elem;
+	}
+
+	template <class RowIter, class ColIter, class ValIter >
+	void pack_storage(compressed_row_matrix<RowIter, ColIter, ValIter>& m)
+	{
+		pack_storage(m, std::plus<typename std::iterator_traits<ValIter>::value_type > ());
+	}
 	
     /*template <class Matrix, class RowIter, class ColIter, class ValIter>
 	copy_matrix_to_compressed_row_data(Matrix& m,
@@ -443,6 +475,67 @@ namespace yasmic
 	}*/
 
 
+	template <class RowIter, class ColIter, class ValIter, class Iter1, class Iter2>
+	void mult(const compressed_row_matrix<RowIter, ColIter, ValIter>& m, Iter1 x, Iter2 y)
+	{
+		RowIter ri = m._rstart;
+		ColIter ci = m._cstart;
+		ValIter vi = m._vstart;
+
+		typedef compressed_row_matrix<RowIter, ColIter, ValIter> matrix;
+		typedef typename smatrix_traits<matrix>::index_type itype;
+		typedef typename smatrix_traits<matrix>::size_type stype;
+
+		stype nr = nrows(m);
+
+		for (itype r=0; r < nr; ++r)
+		{
+			typedef typename smatrix_traits<matrix>::nz_index_type nzitype;
+			typedef typename smatrix_traits<matrix>::value_type vtype;
+
+			vtype ip = 0.0;
+
+			for (nzitype cp = ri[r]; cp < ri[r+1]; ++cp)
+			{
+				ip += vi[cp]*x[ci[cp]];
+			}
+
+			y[r] = ip;
+		}
+	}
+
+	template <class RowIter, class ColIter, class ValIter, class Iter1, class Iter2>
+	void trans_mult(const compressed_row_matrix<RowIter, ColIter, ValIter>& m, Iter1 x, Iter2 y)
+	{
+		RowIter ri = m._rstart;
+		ColIter ci = m._cstart;
+		ValIter vi = m._vstart;
+
+		typedef compressed_row_matrix<RowIter, ColIter, ValIter> matrix;
+		typedef typename smatrix_traits<matrix>::index_type itype;
+		typedef typename smatrix_traits<matrix>::size_type stype;
+
+		stype nc = ncols(m);
+
+		// first zero the vector
+		for (itype c=0; c < nc; ++c)
+		{
+			y[c] = 0.0;
+		}
+
+		for (itype c=0; c < nc; ++c)
+		{
+			typedef typename smatrix_traits<matrix>::nz_index_type nzitype;
+			typedef typename smatrix_traits<matrix>::value_type vtype;
+
+			vtype cv = x[c];
+
+			for (nzitype cp = ri[c]; cp < ri[c+1]; ++cp)
+			{
+				y[ci[cp]] += vi[cp]*cv;
+			}
+		}
+	}
 
 }
 
