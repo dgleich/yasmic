@@ -235,6 +235,59 @@ namespace yasmic
 		return std::make_pair(br, be);
     	//return (make_pair(m.begin_row(r), m.end_row(r)));
     }
+
+	template <class Matrix, class Iter1, class Iter2>
+	void mult(Matrix& m, Iter1 x, Iter2 y)
+	{
+		using namespace yasmic;
+
+		
+		typedef typename smatrix_traits<Matrix>::index_type itype;
+		typedef typename smatrix_traits<Matrix>::size_type stype;
+		typedef typename smatrix_traits<Matrix>::value_type vtype;
+
+		stype nr = nrows(m);
+
+		// first zero the vector
+		for (itype r=0; r < nr; ++r)
+		{
+			y[r] = vtype();
+		}
+
+		smatrix_traits<Matrix>::nonzero_iterator nzi, nziend;
+		for (boost::tie(nzi,nziend) = nonzeros(m);
+			 nzi != nziend; ++nzi)
+		{
+			y[row(*nzi,m)] += value(*nzi,m)*x[column(*nzi,m)];
+		}
+	}
+
+	template <class Matrix, class Iter1, class Iter2>
+	void trans_mult(Matrix& m, Iter1 x, Iter2 y)
+	{
+		using namespace yasmic;
+
+		
+		typedef typename smatrix_traits<Matrix>::index_type itype;
+		typedef typename smatrix_traits<Matrix>::size_type stype;
+		typedef typename smatrix_traits<Matrix>::value_type vtype;
+
+		stype nc = ncols(m);
+
+		// first zero the vector
+		for (itype c=0; c < nc; ++c)
+		{
+			y[c] = vtype();
+		}
+
+		smatrix_traits<Matrix>::nonzero_iterator nzi, nziend;
+		for (boost::tie(nzi,nziend) = nonzeros(m);
+			 nzi != nziend; ++nzi)
+		{
+			y[column(*nzi,m)] += value(*nzi,m)*x[row(*nzi,m)];
+		}
+	}
+
 }
 
 #endif // YASMIC_GENERIC_MATRIX_OPERATIONS

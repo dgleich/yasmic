@@ -239,6 +239,23 @@
 				RelativePath=".\tuple_utility.hpp"
 				>
 			</File>
+			<File
+				RelativePath=".\verbose_util.hpp"
+				>
+			</File>
+			<Filter
+				Name="util"
+				Filter="util\*.hpp"
+				>
+				<File
+					RelativePath=".\util\filtered_matrix.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\util\load_crm_graph.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

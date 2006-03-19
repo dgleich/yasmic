@@ -9,6 +9,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 
+#include <algorithm>
 #include <functional>
 #include <boost/functional.hpp>
 
@@ -446,35 +447,155 @@ namespace yasmic
 	{
 		pack_storage(m, std::plus<typename std::iterator_traits<ValIter>::value_type > ());
 	}
-	
-    /*template <class Matrix, class RowIter, class ColIter, class ValIter>
-	copy_matrix_to_compressed_row_data(Matrix& m,
-		RowIter rstart, RowIter rend, 
-        ColIter cstart, ColIter cend, ValIter vstart, ValIter vend,
-		)
+
+	/**
+	 * The version with a custom sorting operation.  
+	 */
+	template <class RowIter, class ColIter, class ValIter, class StrictWeakOrdering>
+	void sort_storage(compressed_row_matrix<RowIter, ColIter, ValIter>& m,
+		StrictWeakOrdering comp)
 	{
-		smatrix_traits<simple_matrix>::nonzero_iterator nzi, nzend;
-    	tie(nzi, nzend) = nonzeros(m);
-    	for (; nzi != nzend; ++nzi)
-    	{
-            rows[row(*nzi, m)+1]++;
-    	}
-    	
-    	// compute the reduction
-    	partial_sum(rows.begin(), rows.end(), rows.begin());
-    	
-    	tie(nzi, nzend) = nonzeros(m);
-    	for (; nzi != nzend; ++nzi)
-    	{
-    		cout << "cur entry " << rows[row(*nzi, m)]+cur[row(*nzi, m)]
-    		     << " = " << boost::tuples::make_tuple(row(*nzi, m), column(*nzi, m), value(*nzi, m)) << endl;
-            cols[rows[row(*nzi, m)]+cur[row(*nzi, m)]] = column(*nzi, m);
-            vals[rows[row(*nzi, m)]+cur[row(*nzi, m)]] = value(*nzi, m);
-            cur[row(*nzi, m)]++;
-    	}
-	}*/
+	}
+
+	namespace impl
+	{
+		template <class ColIter, class ValIter>
+		struct crm_col_val_iter_helper_type
+		{
+			typedef boost::tuple<
+					typename std::iterator_traits<ColIter>::value_type, 
+					typename std::iterator_traits<ValIter>::value_type >
+				value_type;
+
+			typedef boost::tuple<
+					typename std::iterator_traits<ColIter>::value_type&, 
+					typename std::iterator_traits<ValIter>::value_type& >
+				ref_type;
+		};
+
+	
+
+		template <class ColIter, class ValIter>
+		class crm_col_val_iter
+			: public boost::iterator_facade<
+				crm_col_val_iter<ColIter, ValIter>,
+				typename crm_col_val_iter_helper_type<ColIter, ValIter>::value_type,
+				std::random_access_iterator_tag,
+				typename crm_col_val_iter_helper_type<ColIter, ValIter>::ref_type,
+				typename std::iterator_traits<ColIter>::difference_type>
+		{
+		public:
+			crm_col_val_iter()
+			{}
+
+			crm_col_val_iter(ColIter ci, ValIter vi)
+				: _ci(ci), _vi(vi)
+			{
+			}
+
+			ColIter _ci;
+			ValIter _vi;
 
 
+		private:
+			friend class boost::iterator_core_access;
+
+			void increment()
+			{
+				++_ci; ++_vi;
+			}
+
+			void decrement()
+			{
+				--_ci; --_vi;
+			}
+
+			bool equal(crm_col_val_iter const& other) const
+			{
+				return (_ci == other._ci);
+			}
+
+			typename crm_col_val_iter_helper_type<ColIter, ValIter>::ref_type dereference() const
+			{
+				//_tmp = boost::make_tuple(*_ci, *_vi);
+				//return (_tmp);
+				return (typename crm_col_val_iter_helper_type<ColIter, ValIter>::ref_type(*_ci, *_vi));
+			}
+
+			void advance(difference_type n)
+			{
+				_ci += n;
+				_vi += n;
+			}
+
+			difference_type distance_to(crm_col_val_iter const& other) const
+			{
+				return ( other._ci - _ci);
+			}
+
+
+		};
+
+		template <class ColIter, class ValIter>
+		struct crm_col_val_iter_tuple_compare
+			: public std::binary_function<
+					typename crm_col_val_iter_helper_type<ColIter, ValIter>::value_type,
+					typename crm_col_val_iter_helper_type<ColIter, ValIter>::value_type,
+					bool>
+		{
+			typedef typename crm_col_val_iter_helper_type<ColIter, ValIter>::value_type T;
+			bool operator()(const  T& t1, const T& t2)
+			{
+				return (t1.get<0>() < t2.get<0>());
+			}
+		};
+
+		template <class ColIter, class ValIter>
+		crm_col_val_iter<ColIter, ValIter>
+		crm_make_col_val_iter(ColIter ci, ValIter vi)
+		{
+			return crm_col_val_iter<ColIter, ValIter>(ci, vi);
+		};
+	}
+
+
+	/**
+	 * Sort the storage of a matrix.  This function sorts the entries
+	 * in each row by column.
+	 */
+	template <class RowIter, class ColIter, class ValIter>
+	void sort_storage(compressed_row_matrix<RowIter, ColIter, ValIter>& m)
+	{
+		typedef compressed_row_matrix<RowIter, ColIter, ValIter> Matrix;
+		typedef smatrix_traits<Matrix> traits;
+
+		typedef typename traits::index_type itype;
+		typedef typename traits::value_type vtype;
+
+		RowIter ri, riend;
+		ri = m._rstart;
+		riend = m._rend-1;
+
+		ColIter ci = m._cstart;
+		ValIter vi = m._vstart;
+
+		for(; ri != riend; ++ri)
+		{
+			typename traits::nz_index_type pos_start = *ri;
+			typename traits::nz_index_type pos_end = *(ri+1);
+
+			std::sort(
+				impl::crm_make_col_val_iter(ci + pos_start, vi + pos_start),
+				impl::crm_make_col_val_iter(ci + pos_end, vi + pos_end),
+				impl::crm_col_val_iter_tuple_compare<ColIter,ValIter>());
+		}
+
+
+	}
+	
+	/**
+	 * Specialize the multiply operator for this matrix type.
+	 */
 	template <class RowIter, class ColIter, class ValIter, class Iter1, class Iter2>
 	void mult(const compressed_row_matrix<RowIter, ColIter, ValIter>& m, Iter1 x, Iter2 y)
 	{
@@ -504,6 +625,9 @@ namespace yasmic
 		}
 	}
 
+	/**
+	 * Specialize the transpose multiply operator for this matrix type.
+	 */
 	template <class RowIter, class ColIter, class ValIter, class Iter1, class Iter2>
 	void trans_mult(const compressed_row_matrix<RowIter, ColIter, ValIter>& m, Iter1 x, Iter2 y)
 	{
