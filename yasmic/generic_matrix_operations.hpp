@@ -254,7 +254,7 @@ namespace yasmic
 			y[r] = vtype();
 		}
 
-		smatrix_traits<Matrix>::nonzero_iterator nzi, nziend;
+		typename smatrix_traits<Matrix>::nonzero_iterator nzi, nziend;
 		for (boost::tie(nzi,nziend) = nonzeros(m);
 			 nzi != nziend; ++nzi)
 		{
@@ -280,7 +280,7 @@ namespace yasmic
 			y[c] = vtype();
 		}
 
-		smatrix_traits<Matrix>::nonzero_iterator nzi, nziend;
+		typename smatrix_traits<Matrix>::nonzero_iterator nzi, nziend;
 		for (boost::tie(nzi,nziend) = nonzeros(m);
 			 nzi != nziend; ++nzi)
 		{

@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <functional>
 #include <boost/functional.hpp>
+#include <vector>
 
 #include <yasmic/tuple_utility.hpp>
 #include <limits>
@@ -471,6 +472,16 @@ namespace yasmic
 					typename std::iterator_traits<ColIter>::value_type&, 
 					typename std::iterator_traits<ValIter>::value_type& >
 				ref_type;
+
+			/*typedef std::pair<
+					typename std::iterator_traits<ColIter>::value_type, 
+					typename std::iterator_traits<ValIter>::value_type >
+				value_type;
+
+			typedef std::pair<
+					typename std::iterator_traits<ColIter>::value_type&, 
+					typename std::iterator_traits<ValIter>::value_type& >
+				ref_type;*/
 		};
 
 	
@@ -546,7 +557,7 @@ namespace yasmic
 			typedef typename crm_col_val_iter_helper_type<ColIter, ValIter>::value_type T;
 			bool operator()(const  T& t1, const T& t2)
 			{
-				return (t1.get<0>() < t2.get<0>());
+				return (boost::get<0>(t1) < boost::get<0>(t2));
 			}
 		};
 
