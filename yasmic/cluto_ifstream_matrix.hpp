@@ -21,6 +21,73 @@ namespace yasmic
 {
 	namespace impl
 	{
+        /*template <class i_index_type, class i_value_type>
+        class dense_cluto_ifstream_matrix_const_iterator
+		: public boost::iterator_facade<
+            dense_cluto_ifstream_matrix_const_iterator<i_index_type, i_value_type>,
+            boost::tuple<
+                i_index_type, i_index_type, i_value_type> const,
+            boost::forward_traversal_tag, 
+            boost::tuple<
+                i_index_type, i_index_type, i_value_type> const >
+        {
+        public:
+            dense_cluto_ifstream_matrix_const_iterator() 
+				: _str(0), _r(0), _c(0), _v(0)
+			{}
+            
+            dense_cluto_ifstream_matrix_const_iterator(std::ifstream &str)
+				: _str(&str), _r(0), _c(0), _v(0)
+            {
+				*(_str) >> _v;
+			}
+            
+            
+        private:
+            friend class boost::iterator_core_access;
+
+            void increment() 
+            {  
+				if (_str != 0)
+				{
+					*(_str) >> _v;
+
+                    if (_str->eof())
+                    {
+                        _str = 0;
+                        return;
+                    }
+
+                    ++_c;
+
+                    if (_c >= _ncols)
+                    {
+                        _c = 0;
+                        ++_r;
+                    }
+				}
+            }
+            
+            bool equal(dense_cluto_ifstream_matrix_const_iterator const& other) const
+            {
+				return (_str == other._str);
+            }
+            
+            boost::tuple<
+                i_index_type, i_index_type, i_value_type>
+            dereference() const 
+            { 
+            	return boost::make_tuple(_r, _c, _v);
+            }
+
+			i_index_type _r, _c;
+			i_value_type _v;
+
+			index_type _ncols;
+
+			std::ifstream* _str;
+        };*/
+
 		template <class i_index_type, class i_value_type>
 		class cluto_ifstream_matrix_const_iterator
 		: public boost::iterator_facade<
@@ -33,17 +100,19 @@ namespace yasmic
         {
         public:
             cluto_ifstream_matrix_const_iterator() 
-				: _str(0), _r(0), _c(0), _v(0), _line(0)
+				: _str(0), _r(0), _c(0), _v(0), _line(0), _dense(false), _start(false)
 			{}
             
-            cluto_ifstream_matrix_const_iterator(std::ifstream &str, std::istringstream &line)
-				: _str(&str), _r(0), _c(0), _v(0), _line(&line)
+            cluto_ifstream_matrix_const_iterator(std::ifstream &str, std::istringstream &line, bool dense)
+				: _str(&str), _r(0), _c(0), _v(0), _line(&line), _dense(dense), _start(true)
             {
 				std::string curline;
 				getline( *(_str), curline );
-				getline( *(_str), curline );
-				_line->str(curline);
 
+                // set the fail bit so that that increment will
+                // discard this line immediately...
+                _line->setstate(std::ios_base::failbit);
+				
 				increment(); 
 			}
             
@@ -55,7 +124,20 @@ namespace yasmic
             {  
 				if (_str != 0)
 				{
-					while (_line->eof())
+                    if (_dense)
+                    {
+                        *(_line) >> _v;
+                        ++_c;
+                    }
+                    else
+                    {
+                        // cluto uses 1 indexed columns
+                        *(_line) >> _c;
+                        *(_line) >> _v;
+                        --_c;
+                    }
+
+					while (_line->fail())
 					{
 						// I don't like the early return here, but 
 						// I don't know what to do about it...
@@ -66,11 +148,28 @@ namespace yasmic
 						_line->clear();
 						_line->str(curline);
 
-						++_r;
-					}
+                        if (!_start)
+                        {
+    						++_r;
+                        }
+                        else
+                        {
+                            _start = false;
+                        }
 
-					*(_line) >> _c;
-					*(_line) >> _v;
+                        if (_dense)
+                        {
+                            *(_line) >> _v;
+                            _c = 0;
+                        }
+                        else
+                        {
+                            // cluto uses 1 indexed columns
+                            *(_line) >> _c;
+                            *(_line) >> _v;
+                            --_c;
+                        }
+					}
 				}
             }
             
@@ -89,6 +188,9 @@ namespace yasmic
 			i_index_type _r, _c;
 			i_value_type _v;
 
+            bool _dense;
+            bool _start;
+
 			std::istringstream* _line;
 
 			std::ifstream* _str;
@@ -103,9 +205,188 @@ namespace yasmic
 		std::ifstream& _f;
 		std::istringstream _line;
 
+        bool _graph;
+        bool _dense;
+
 		cluto_ifstream_matrix(std::ifstream& f)
-			: _f(f) 
-		{}
+			: _f(f), _graph(false), _dense(false)
+		{
+            detect_graph_and_dense();
+        }
+
+        cluto_ifstream_matrix(std::ifstream& f, bool graph)
+			: _f(f), _graph(graph), _dense(false)
+		{
+            detect_dense();
+        }
+
+        cluto_ifstream_matrix(std::ifstream& f, bool graph, bool dense)
+			: _f(f), _graph(graph), _dense(dense)
+		{
+        }
+
+    private:
+        /**
+         * matrix-type detection algorithm
+         *
+         * 1.  if there is only one or three tokens on the first line, then,
+         *     one token => dense graph
+         *     three tokens => sparse matrix
+         * 2.  if the first line of the file contains fewer than
+         *     ncols tokens => sparse graph
+         * 3.  if the first line contains invalid integers at
+         *     even locations => dense graph
+         * 4.  repeat for all lines...
+         */
+
+        void detect_graph_and_dense()
+        {
+            std::string line;
+            getline( _f, line );
+            _line.clear(); _line.str(line);
+
+            int tok_count=0;
+
+
+            while (!_line.eof())
+            {
+                // these entries are either index_type or
+                // size_type, but size_type should be larger
+                // than index type...
+                size_type st;
+                _line >> st;
+                tok_count++;
+            }
+
+            if (tok_count == 1)
+            {
+                _dense = true;
+                _graph = true;
+                return;
+            }
+            else if (tok_count == 3)
+            {
+                _dense = false;
+                _graph = false;
+                return;
+            }
+
+            _f.clear();
+    	    _f.seekg(0, std::ios_base::beg);
+
+            index_type maybe_nrows;
+            size_type maybe_ncols;
+
+            _f >> maybe_nrows;
+            _f >> maybe_ncols;
+
+            getline( _f, line );
+
+            while (_f)
+            {
+                getline( _f, line );
+                _line.clear(); _line.str(line);
+
+                if (detect_graph_and_dense_check_line(maybe_nrows, maybe_ncols))
+                {
+                    return;
+                }
+            }
+
+            // if we've gotten all the way through the matrix and 
+            // there still isn't anything left...
+
+            _dense = true;
+            _graph = false;
+
+            
+        }
+
+        void detect_dense()
+        {
+            std::string line;
+            getline( _f, line );
+            _line.clear(); _line.str(line);
+
+            int tok_count=0;
+
+            while (_line)
+            {
+                size_type st;
+                _line >> st;
+                tok_count++;
+            }
+
+            if (tok_count == 1)
+            {
+                _dense = true;
+            }
+            else 
+            {
+                _dense = false;
+            }
+
+            _f.clear();
+    	    _f.seekg(0, std::ios_base::beg);
+
+            return;
+        }
+
+        /**
+         * Checks the current _line to determine if the
+         * input is dense or sparse.
+         *
+         * @return true if detection occured, false otherwise
+         */
+        bool detect_graph_and_dense_check_line(index_type maybe_nrows, size_type maybe_ncols)
+        {
+            int tok_count = 0;
+
+            while (!_line.eof())
+            {
+                index_type i;
+                
+                _line >> i;
+
+                if (_line.eof())
+                {
+                    // the correct behavior will happen if we 
+                    // just wrap around...
+                }
+                else if (!_line.fail())
+                {
+                    if (i < 1 || i > maybe_nrows)
+                    {
+                        _dense = true;
+                        _graph = false;
+                        return (true);
+                    }
+                    // we always have to be
+                    // able to parse a value...
+                    value_type v;                  
+
+                    _line >> v;
+                    tok_count+=2;
+                }
+                else
+                {
+                    _dense = true;
+                    _graph = false;
+                    return (true);
+                }
+            }
+
+            if (tok_count == maybe_ncols)
+            {
+                return (false);
+            }
+            else
+            {
+                _dense = false;
+                _graph = true;
+                return (true);
+            }
+        }
 	};
 
 	template <class i_index_type, class i_value_type, class i_size_type>
@@ -140,7 +421,15 @@ namespace yasmic
     	m._f.clear();
     	m._f.seekg(0, std::ios_base::beg);
 
-		m._f >> nrows >> ncols;
+		if (m._graph)
+        {
+            m._f >> nrows;
+            ncols = nrows;
+        }
+        else
+        {
+            m._f >> nrows >> ncols;
+        }
     	        
         return (std::make_pair(nrows, ncols));
     }
@@ -150,20 +439,41 @@ namespace yasmic
 	nnz(cluto_ifstream_matrix<i_index_type, i_value_type, i_size_type>& m)
 	{
 		typedef smatrix_traits<cluto_ifstream_matrix<i_index_type, i_value_type, i_size_type> > traits;
-    	typename traits::size_type d1, d2, nnz;
+    	typename traits::index_type d1, d2;
+        typename traits::size_type nnz;
+
+        typedef typename traits::size_type size_type;
 		
 		// clear any error bits
 		m._f.clear();
 		m._f.seekg(0, std::ios_base::beg);
 
-		m._f >> d1 >> d2 >> nnz;
-		
-		// seek after nrows, ncols
-        /*m._f.seekg(2*sizeof(i_index_type), std::ios_base::beg);
-
-        m._f.read((char *)&nnz, sizeof(i_size_type));*/
-        
-        return (nnz);
+        if (m._dense)
+        {
+            if (m._graph)
+            {
+                m._f >> nnz;
+                return (nnz*nnz);
+            }
+            else
+            {
+                m._f >> d1 >> d2;
+                return (((size_type)d1)*((size_type)d2));
+            }
+        }
+        else
+        {
+            if (m._graph)
+            {
+                m._f >> d1 >> nnz;
+                return (nnz);
+            }
+            else
+            {
+                m._f >> d1 >> d2 >> nnz;
+                return (nnz);
+            }
+        }
 	}
 	
 	template <class i_index_type, class i_value_type, class i_size_type>
@@ -172,19 +482,23 @@ namespace yasmic
     nonzeros(cluto_ifstream_matrix<i_index_type, i_value_type, i_size_type>& m)
     {
     	typedef smatrix_traits<cluto_ifstream_matrix<i_index_type, i_value_type, i_size_type> > traits;
-    	typename traits::size_type d1, d2, d3;
+    	//typename traits::size_type ncols;
 
     	m._f.clear();
 		m._f.seekg(0, std::ios_base::beg);
 
-		m._f >> d1 >> d2 >> d3;
+
+        //getline(m._f, header_line);
+		//m._f >> d1 >> d2 >> d3;
 
 		// seek after nrows,ncols,nnz
     	//m._f.seekg(2*sizeof(i_index_type)+sizeof(i_size_type), std::ios_base::beg);
         
         typedef typename traits::nonzero_iterator nz_iter;
         
-        return (std::make_pair(nz_iter(m._f, m._line), nz_iter()));
+
+        return (std::make_pair(nz_iter(m._f, m._line, m._dense), nz_iter()));
+
     }
 }
 

@@ -255,6 +255,10 @@
 					RelativePath=".\util\load_crm_graph.hpp"
 					>
 				</File>
+				<File
+					RelativePath=".\util\load_crm_matrix.hpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

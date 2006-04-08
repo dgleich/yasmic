@@ -1,16 +1,16 @@
-#ifndef YASMIC_UTIL_LOAD_CRM_GRAPH
-#define YASMIC_UTIL_LOAD_CRM_GRAPH
+#ifndef YASMIC_UTIL_LOAD_CRM_MATRIX
+#define YASMIC_UTIL_LOAD_CRM_MATRIX
 
 /*
- * load_crm_graph.hpp
+ * load_crm_matrix.hpp
  * David Gleich
  * Stanford University
- * 26 January 2006
+ * 25 March 2006
  */
 
 /**
- * @file load_crm_graph.hpp
- * Load a graph or matrix into a crm data structure.
+ * @file load_crm_matrix.hpp
+ * Load a matrix into a crm data structure.
  */
 #include <cctype>
 #include <iostream>
@@ -25,6 +25,7 @@
 #include <yasmic/ifstream_matrix.hpp>
 #include <yasmic/binary_ifstream_matrix.hpp>
 #include <yasmic/cluto_ifstream_matrix.hpp>
+#include <yasmic/graph_ifstream_matrix.hpp>
 
 #ifdef BOOST_MSVC
 #if _MSC_VER >= 1400
@@ -48,7 +49,7 @@ bool load_matrix_to_crm(InputMatrix& m,
 
 	typedef typename iterator_traits<RAIRows>::value_type index_type;
 
-	typename smatrix_traits<InputMatrix>::size_type nr = nrows(m);
+	typename smatrix_traits<InputMatrix>::index_type nr = nrows(m);
 	typename smatrix_traits<InputMatrix>::nz_index_type nzcount = 0;
 
 	typename smatrix_traits<InputMatrix>::nonzero_iterator nzi, nzend;
@@ -253,7 +254,7 @@ bool load_crm_graph_type(InputMatrix& m, std::string filename,
 
 
 /**
- * Load a CRM graph from a file into a set of vectors.  
+ * Load a CRM matrix from a file into a set of vectors.  
  *
  * This operation is actually somewhat tricky.  We to do a few things.
  * 1.  Allocate storage in the passed std::vectors.
@@ -265,7 +266,7 @@ bool load_crm_graph_type(InputMatrix& m, std::string filename,
  * the work on load_crm_graph_type.
  */
 template <class Index, class Value>
-bool load_crm_graph(std::string filename, 
+bool load_crm_matrix(std::string filename, 
 					std::vector<Index>& rows, std::vector<Index>& cols,
 					std::vector<Value>& vals,
 					Index &nr, Index &nc, Index &nzcount)
@@ -282,7 +283,32 @@ bool load_crm_graph(std::string filename,
 		string ext = filename.substr(dot+1);
 		transform(ext.begin(), ext.end(), ext.begin(), (int(*)(int))tolower);	
 
-		if (ext.compare("smat") == 0 || ext.compare("graph") == 0)
+        bool smat_graph = false;
+
+        if (ext.compare("graph") == 0)
+        {
+            // if the first line of a .graph file has 3 entries, 
+            ifstream ifs(filename.c_str());
+            string line;
+            getline(ifs,line);
+            istringstream iss(line);
+
+            Index i;
+            iss >> i;
+            iss >> i;
+            iss >> i;
+
+            if (iss.fail())
+            {
+                smat_graph = false;
+            }
+            else
+            {
+                smat_graph = true;
+            }
+        }
+
+		if (ext.compare("smat") == 0 || smat_graph)
 		{
 			if (verbose) std::cerr << "using smat loader..." << std::endl;
 
@@ -309,6 +335,14 @@ bool load_crm_graph(std::string filename,
 			return (load_crm_graph_type(m, filename, rows, cols, vals,
 						nr, nc, nzcount));
 		}
+        else if (ext.compare("graph") == 0)
+        {
+            if (verbose) std::cerr << "using graph loader..." << std::endl;
+            ifstream ifs(filename.c_str());
+			yasmic::graph_ifstream_matrix<> m(ifs);
+			return (load_crm_graph_type(m, filename, rows, cols, vals,
+						nr, nc, nzcount));
+        }
 		else
 		{
 			cerr << "Error: matrix type unknown." << endl;
@@ -330,5 +364,5 @@ bool load_crm_graph(std::string filename,
 #endif // _MSC_VER >= 1400
 #endif // BOOST_MSVC
 
-#endif // YASMIC_UTIL_LOAD_CRM_GRAPH
+#endif // YASMIC_UTIL_LOAD_CRM_MATRIX
 

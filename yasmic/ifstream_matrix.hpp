@@ -131,6 +131,9 @@ namespace yasmic
         
         return (std::make_pair(nz_iter(m._f), nz_iter()));
     }
+
+    
+
 }
 
 #endif //YASMIC_IFSTREAM_MATRIX
