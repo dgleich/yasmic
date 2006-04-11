@@ -672,6 +672,32 @@ namespace yasmic
 		}
 	}
 
+    /**
+	 * Specialize the transpose multiply operator for this matrix type.
+	 */
+	template <class RowIter, class ColIter, class ValIter>
+	typename smatrix_traits< compressed_row_matrix<RowIter, ColIter, ValIter> >::value_type value(
+        typename smatrix_traits< compressed_row_matrix<RowIter, ColIter, ValIter> >::index_type row,
+        typename smatrix_traits< compressed_row_matrix<RowIter, ColIter, ValIter> >::index_type col,
+        const compressed_row_matrix<RowIter, ColIter, ValIter>& m)
+	{
+		RowIter ri = m._rstart;
+		ColIter ci = m._cstart;
+		ValIter vi = m._vstart;
+
+        typedef typename smatrix_traits<matrix>::nz_index_type nzitype;
+        
+        for (nzi_type cp = ri[row]; cp < ri[row+2]; ++cp)
+        {
+            if (column == ci[cp])
+            {
+                return (vi[cp]);
+            }
+        }
+
+        return (0);
+	}
+
 }
 
 #endif // YASMIC_COMPRESSED_ROW_MATRIX

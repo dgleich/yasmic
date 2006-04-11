@@ -236,6 +236,30 @@ namespace yasmic
     	//return (make_pair(m.begin_row(r), m.end_row(r)));
     }
 
+    template <class Matrix>
+    typename smatrix_traits<Matrix>::value_type value(
+        typename smatrix_traits<Matrix>::index_type r,
+        typename smatrix_traits<Matrix>::index_type c,
+        Matrix& m)
+    {
+        using namespace yasmic;
+
+        typedef typename smatrix_traits<Matrix>::index_type itype;
+        typedef typename smatrix_traits<Matrix>::value_type vtype;
+
+        typename smatrix_traits<Matrix>::nonzero_iterator nzi, nziend;
+		for (boost::tie(nzi,nziend) = nonzeros(m);
+			 nzi != nziend; ++nzi)
+		{
+			if (row(*nzi,m)==r && column(*nzi,m)==c)
+            {
+                return (value(*nzi,m));
+            }
+		}
+
+        return (0);
+    }
+
 	template <class Matrix, class Iter1, class Iter2>
 	void mult(Matrix& m, Iter1 x, Iter2 y)
 	{

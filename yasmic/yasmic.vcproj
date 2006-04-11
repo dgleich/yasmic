@@ -204,6 +204,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\graph_ifstream_matrix.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ifstream_as_matrix.hpp"
 				>
 			</File>
