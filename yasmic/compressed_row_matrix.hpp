@@ -675,7 +675,7 @@ namespace yasmic
 	}
 
     /**
-	 * Specialize the transpose multiply operator for this matrix type.
+	 * Specialize the value operator for this matrix type.
 	 */
 	template <class RowIter, class ColIter, class ValIter>
 	typename smatrix_traits< compressed_row_matrix<RowIter, ColIter, ValIter> >::value_type value(
@@ -689,9 +689,9 @@ namespace yasmic
 		ColIter ci = m._cstart;
 		ValIter vi = m._vstart;
 
-        typedef typename smatrix_traits<matrix>::nz_index_type nzitype;
+        typedef typename smatrix_traits<matrix>::nz_index_type nzi_type;
         
-        for (nzi_type cp = ri[row]; cp < ri[row+2]; ++cp)
+        for (nzi_type cp = ri[row]; cp < ri[row+1]; ++cp)
         {
             if (column == ci[cp])
             {
