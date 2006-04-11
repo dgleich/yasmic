@@ -510,6 +510,8 @@ namespace yasmic
 
 		private:
 			friend class boost::iterator_core_access;
+            typedef typename std::iterator_traits<ColIter>::difference_type my_difference_type;
+
 
 			void increment()
 			{
@@ -533,13 +535,13 @@ namespace yasmic
 				return (typename crm_col_val_iter_helper_type<ColIter, ValIter>::ref_type(*_ci, *_vi));
 			}
 
-			void advance(difference_type n)
+			void advance(my_difference_type n)
 			{
 				_ci += n;
 				_vi += n;
 			}
 
-			difference_type distance_to(crm_col_val_iter const& other) const
+			my_difference_type distance_to(crm_col_val_iter const& other) const
 			{
 				return ( other._ci - _ci);
 			}
@@ -681,6 +683,8 @@ namespace yasmic
         typename smatrix_traits< compressed_row_matrix<RowIter, ColIter, ValIter> >::index_type col,
         const compressed_row_matrix<RowIter, ColIter, ValIter>& m)
 	{
+        typedef compressed_row_matrix<RowIter, ColIter, ValIter> matrix;
+
 		RowIter ri = m._rstart;
 		ColIter ci = m._cstart;
 		ValIter vi = m._vstart;

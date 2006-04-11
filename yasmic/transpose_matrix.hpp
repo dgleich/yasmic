@@ -97,3 +97,5 @@ column(typename impl::transpose_matrix_help<Matrix>::traits::nonzero_descriptor 
 } // namespace yasmic
 
 #endif // YASMIC_TRANSPOSE_MATRIX
+
+
