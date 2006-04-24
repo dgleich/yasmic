@@ -90,13 +90,17 @@ namespace boost
     
 		typedef typename yasmic::smatrix_traits<smatrix_type>::nonzero_iterator edge_iterator;
 		
-	
 		typedef directed_tag directed_category;
 		typedef allow_parallel_edge_tag edge_parallel_category;
 		typedef yasmic_compressed_row_matrix_traversal_category traversal_category;
 		typedef typename yasmic::smatrix_traits<smatrix_type>::index_type vertices_size_type;
 		typedef typename yasmic::smatrix_traits<smatrix_type>::size_type edges_size_type;
 		typedef typename yasmic::smatrix_traits<smatrix_type>::size_type degree_size_type;
+
+        static vertex_descriptor null_vertex()
+        {
+            return std::numeric_limits<vertex_descriptor>::max();
+        }
 	};
 
 	namespace impl
@@ -282,7 +286,7 @@ namespace boost
 	}
 
 	template <class RowIter, class ColIter, class ValIter>
-	typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::smatrix_traits::size_type
+	typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::degree_size_type
 	out_degree(
 		typename impl::crm_graph_ret<RowIter, ColIter, ValIter>::g_traits::vertex_descriptor v,
 		const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g)

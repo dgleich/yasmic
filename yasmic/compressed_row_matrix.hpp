@@ -19,7 +19,6 @@
 
 #include <yasmic/generic_matrix_operations.hpp>
 
-
 namespace yasmic
 {
 	namespace impl
@@ -693,7 +692,7 @@ namespace yasmic
         
         for (nzi_type cp = ri[row]; cp < ri[row+1]; ++cp)
         {
-            if (column == ci[cp])
+            if (col == ci[cp])
             {
                 return (vi[cp]);
             }
@@ -703,6 +702,8 @@ namespace yasmic
 	}
 
 }
+
+
 
 #endif // YASMIC_COMPRESSED_ROW_MATRIX
 

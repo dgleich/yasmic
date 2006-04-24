@@ -18,6 +18,9 @@
 #include <iterator>
 #include <numeric>
 
+#include <string>
+#include <algorithm>
+
 #include <vector>
 
 #include <boost/iterator/reverse_iterator.hpp>
@@ -50,11 +53,16 @@ bool load_matrix_to_crm(InputMatrix& m,
 	typedef typename iterator_traits<RAIRows>::value_type index_type;
 
 	typename smatrix_traits<InputMatrix>::index_type nr = nrows(m);
+    typename smatrix_traits<InputMatrix>::index_type nc = ncols(m);
 	typename smatrix_traits<InputMatrix>::nz_index_type nzcount = 0;
 
 	typename smatrix_traits<InputMatrix>::nonzero_iterator nzi, nzend;
 
 	int warning = 0;
+
+    typename smatrix_traits<InputMatrix>::index_type last_good_r = 0;
+    typename smatrix_traits<InputMatrix>::index_type last_good_c = 0;
+	typename smatrix_traits<InputMatrix>::nz_index_type last_good_nz = 0;
 
 	if (nr < 1)
 	{
@@ -68,7 +76,10 @@ bool load_matrix_to_crm(InputMatrix& m,
 		boost::tie(nzi, nzend) = nonzeros(m);
 		for (; nzi != nzend; ++nzi)
 		{
-			warning = warning | (row(*nzi, m) >= nr) | (column(*nzi, m) >= nr);
+			warning = warning | (row(*nzi, m) >= nr) | (column(*nzi, m) >= nc);
+            last_good_r = (!warning)*row(*nzi,m);
+            last_good_c = (!warning)*column(*nzi,m);
+            last_good_nz = (!warning)*nzcount;
 			++rows[row(*nzi, m)*(!warning)+1];
 			++nzcount;
 		}
@@ -76,7 +87,9 @@ bool load_matrix_to_crm(InputMatrix& m,
 		if (warning)
 		{
 			using namespace std;
-			cerr << "error: invalid matrix data, nrows or ncols exceeded" << endl;
+			cerr << "error: invalid matrix data, nrows or ncols exceeded (" 
+                << last_good_r << "," << last_good_c << "," << last_good_nz << ")"
+                << endl;
 			return (false);
 		}
 
@@ -105,7 +118,7 @@ bool load_matrix_to_crm(InputMatrix& m,
 		++rows[cr];
 		++nzcount;
 
-		warning = warning | (cr >= nr) | (cc >= nr);
+		warning = warning | (cr >= nr) | (cc >= nc);
 	}
 
 	if (warning)
@@ -308,6 +321,7 @@ bool load_crm_matrix(std::string filename,
             }
         }
 
+
 		if (ext.compare("smat") == 0 || smat_graph)
 		{
 			if (verbose) std::cerr << "using smat loader..." << std::endl;
@@ -326,9 +340,10 @@ bool load_crm_matrix(std::string filename,
 			return (load_crm_graph_type(m, filename, rows, cols, vals,
 						nr, nc, nzcount));
 		}
-        else if (ext.compare("mat") == 0)
+        else if (ext.compare("mat") == 0 || ext.compare("cmat") == 0 
+                 || ext.compare("cgraph") == 0)
 		{
-			if (verbose) std::cerr << "cluto mat loader..." << std::endl;
+			if (verbose) std::cerr << "using cluto loader..." << std::endl;
 
 			ifstream ifs(filename.c_str());
 			yasmic::cluto_ifstream_matrix<> m(ifs);
@@ -355,6 +370,51 @@ bool load_crm_matrix(std::string filename,
 	}
 
 	return (false);
+}
+
+template <class Index, class Value>
+bool load_crm_matrix(std::string filetype_hint, std::string filename, 
+					std::vector<Index>& rows, std::vector<Index>& cols,
+					std::vector<Value>& vals,
+					Index &nr, Index &nc, Index &nzcount)
+{
+    using namespace std;
+
+    // convert the filetype_hint to lower case...
+    transform(filetype_hint.begin(),filetype_hint.end(),
+        filetype_hint.begin(), tolower);
+
+    if (filetype_hint.compare("cluto") == 0)
+    {
+        if (verbose) cerr << "using cluto loader..." << endl;
+
+        ifstream ifs(filename.c_str());
+		yasmic::cluto_ifstream_matrix<> m(ifs);
+		return (load_crm_graph_type(m, filename, rows, cols, vals,
+					nr, nc, nzcount));
+    }
+    else if (filetype_hint.compare("graph") == 0)
+    {
+        if (verbose) std::cerr << "using graph loader..." << std::endl;
+        ifstream ifs(filename.c_str());
+		yasmic::graph_ifstream_matrix<> m(ifs);
+		return (load_crm_graph_type(m, filename, rows, cols, vals,
+					nr, nc, nzcount));
+    }
+    else if (filetype_hint.compare("smat") == 0)
+    {
+        if (verbose) std::cerr << "using smat loader..." << std::endl;
+
+		ifstream ifs(filename.c_str());
+		yasmic::ifstream_matrix<> m(ifs);
+		return (load_crm_graph_type(m, filename, rows, cols, vals,
+					nr, nc, nzcount));
+    }
+    else
+    {
+        if (verbose) std::cerr << "filetype hint didn't help :-(, I'll try the extension loader..." << endl;
+        return (load_crm_matrix(filename, rows, cols, vals, nr, nc, nzcount));
+    }
 }
 
 #ifdef BOOST_MSVC

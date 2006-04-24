@@ -10,6 +10,8 @@
 
 #include <yasmic/generic_matrix_operations.hpp>
 
+#include <boost/lexical_cast.hpp>
+
 #ifdef BOOST_MSVC
 #if _MSC_VER >= 1400
 	// disable the warning for ifstream::read
@@ -258,6 +260,11 @@ namespace yasmic
                 tok_count++;
             }
 
+            if (_line.fail())
+            {
+                tok_count--;
+            }
+
             if (tok_count == 1)
             {
                 _dense = true;
@@ -338,13 +345,18 @@ namespace yasmic
          *
          * @return true if detection occured, false otherwise
          */
-        bool detect_graph_and_dense_check_line(index_type maybe_nrows, size_type maybe_ncols)
+        bool detect_graph_and_dense_check_line(index_type maybe_nrows, index_type maybe_ncols)
         {
+            using boost::lexical_cast;
+            using boost::bad_lexical_cast;
+
+
             int tok_count = 0;
+            std::string tok;
 
             while (!_line.eof())
             {
-                index_type i;
+                /*index_type i;
                 
                 _line >> i;
 
@@ -355,7 +367,7 @@ namespace yasmic
                 }
                 else if (!_line.fail())
                 {
-                    if (i < 1 || i > maybe_nrows)
+                    if (i < 1 || i > maybe_ncols)
                     {
                         _dense = true;
                         _graph = false;
@@ -369,6 +381,31 @@ namespace yasmic
                     tok_count+=2;
                 }
                 else
+                {
+                    _dense = true;
+                    _graph = false;
+                    return (true);
+                }*/
+              
+                try
+                {
+                    _line >> tok;
+                    index_type i = lexical_cast<index_type>(tok);
+                    
+
+                    if (i < 1 || i > maybe_ncols)
+                    {
+                        _dense = true;
+                        _graph = false;
+                        return (true);
+                    }
+
+                    _line >> tok;
+                    value_type v = lexical_cast<value_type>(tok);
+
+                    tok_count += 2;
+                }
+                catch (bad_lexical_cast e)
                 {
                     _dense = true;
                     _graph = false;

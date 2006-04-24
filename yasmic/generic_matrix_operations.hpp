@@ -240,9 +240,11 @@ namespace yasmic
     typename smatrix_traits<Matrix>::value_type value(
         typename smatrix_traits<Matrix>::index_type r,
         typename smatrix_traits<Matrix>::index_type c,
-        Matrix& m)
+        const Matrix& m)
     {
         using namespace yasmic;
+
+        BOOST_STATIC_ASSERT(0);
 
         typedef typename smatrix_traits<Matrix>::index_type itype;
         typedef typename smatrix_traits<Matrix>::value_type vtype;
