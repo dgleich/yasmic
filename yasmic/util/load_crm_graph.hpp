@@ -208,7 +208,7 @@ bool load_crm_graph_type(InputMatrix& m, std::string filename,
 
 			if (binary1 || binary2)
 			{
-				if (verbose) std::cerr << "reading binary degree file..." << std::endl;
+				YASMIC_VERBOSE( std::cerr << "reading binary degree file..." << std::endl; )
 
 				// the degrees file is binary
 				std::ifstream degfile(filename_degrees.c_str(), ios::binary);
@@ -231,7 +231,7 @@ bool load_crm_graph_type(InputMatrix& m, std::string filename,
 			}
 			else
 			{
-				if (verbose) std::cerr << "reading ASCII degree file..." << std::endl;
+				YASMIC_VERBOSE( std::cerr << "reading ASCII degree file..." << std::endl; )
 
 				// the degrees file is text
 				std::ifstream degfile(filename_degrees.c_str());
@@ -284,7 +284,7 @@ bool load_crm_graph(std::string filename,
 
 		if (ext.compare("smat") == 0 || ext.compare("graph") == 0)
 		{
-			if (verbose) std::cerr << "using smat loader..." << std::endl;
+			YASMIC_VERBOSE( std::cerr << "using smat loader..." << std::endl; )
 
 			ifstream ifs(filename.c_str());
 			yasmic::ifstream_matrix<> m(ifs);
@@ -293,7 +293,7 @@ bool load_crm_graph(std::string filename,
 		}
 		else if (ext.compare("bsmat") == 0)
 		{
-			if (verbose) std::cerr << "using bsmat loader..." << std::endl;
+			YASMIC_VERBOSE( std::cerr << "using bsmat loader..." << std::endl; )
 
 			ifstream ifs(filename.c_str(), ios::binary);
 			yasmic::binary_ifstream_matrix<> m(ifs);
@@ -302,7 +302,7 @@ bool load_crm_graph(std::string filename,
 		}
         else if (ext.compare("mat") == 0)
 		{
-			if (verbose) std::cerr << "cluto mat loader..." << std::endl;
+			YASMIC_VERBOSE( std::cerr << "cluto mat loader..." << std::endl; )
 
 			ifstream ifs(filename.c_str());
 			yasmic::cluto_ifstream_matrix<> m(ifs);

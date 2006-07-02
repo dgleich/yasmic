@@ -12,6 +12,14 @@
  * @file load_crm_matrix.hpp
  * Load a matrix into a crm data structure.
  */
+
+#ifdef BOOST_MSVC
+#if _MSC_VER >= 1400
+	// disable the warning for ifstream::read
+	#pragma warning( disable : 4996 )
+#endif // _MSC_VER >= 1400
+#endif // BOOST_MSVC
+
 #include <cctype>
 #include <iostream>
 #include <fstream>
@@ -23,6 +31,8 @@
 
 #include <vector>
 
+#include <yasmic/verbose_util.hpp>
+
 #include <boost/iterator/reverse_iterator.hpp>
 
 #include <yasmic/ifstream_matrix.hpp>
@@ -30,12 +40,7 @@
 #include <yasmic/cluto_ifstream_matrix.hpp>
 #include <yasmic/graph_ifstream_matrix.hpp>
 
-#ifdef BOOST_MSVC
-#if _MSC_VER >= 1400
-	// disable the warning for ifstream::read
-	#pragma warning( disable : 4996 )
-#endif // _MSC_VER >= 1400
-#endif // BOOST_MSVC
+
 
 /**
  * This function actually loads the data from a matrix file.
@@ -222,7 +227,7 @@ bool load_crm_graph_type(InputMatrix& m, std::string filename,
 
 			if (binary1 || binary2)
 			{
-				if (verbose) std::cerr << "reading binary degree file..." << std::endl;
+				YASMIC_VERBOSE( std::cerr << "reading binary degree file..." << std::endl; )
 
 				// the degrees file is binary
 				std::ifstream degfile(filename_degrees.c_str(), ios::binary);
@@ -245,7 +250,7 @@ bool load_crm_graph_type(InputMatrix& m, std::string filename,
 			}
 			else
 			{
-				if (verbose) std::cerr << "reading ASCII degree file..." << std::endl;
+				YASMIC_VERBOSE( std::cerr << "reading ASCII degree file..." << std::endl; )
 
 				// the degrees file is text
 				std::ifstream degfile(filename_degrees.c_str());
@@ -324,7 +329,7 @@ bool load_crm_matrix(std::string filename,
 
 		if (ext.compare("smat") == 0 || smat_graph)
 		{
-			if (verbose) std::cerr << "using smat loader..." << std::endl;
+			YASMIC_VERBOSE( std::cerr << "using smat loader..." << std::endl; )
 
 			ifstream ifs(filename.c_str());
 			yasmic::ifstream_matrix<> m(ifs);
@@ -333,7 +338,7 @@ bool load_crm_matrix(std::string filename,
 		}
 		else if (ext.compare("bsmat") == 0)
 		{
-			if (verbose) std::cerr << "using bsmat loader..." << std::endl;
+			YASMIC_VERBOSE( std::cerr << "using bsmat loader..." << std::endl; )
 
 			ifstream ifs(filename.c_str(), ios::binary);
 			yasmic::binary_ifstream_matrix<> m(ifs);
@@ -343,7 +348,7 @@ bool load_crm_matrix(std::string filename,
         else if (ext.compare("mat") == 0 || ext.compare("cmat") == 0 
                  || ext.compare("cgraph") == 0)
 		{
-			if (verbose) std::cerr << "using cluto loader..." << std::endl;
+			YASMIC_VERBOSE( std::cerr << "using cluto loader..." << std::endl; )
 
 			ifstream ifs(filename.c_str());
 			yasmic::cluto_ifstream_matrix<> m(ifs);
@@ -352,7 +357,7 @@ bool load_crm_matrix(std::string filename,
 		}
         else if (ext.compare("graph") == 0)
         {
-            if (verbose) std::cerr << "using graph loader..." << std::endl;
+            YASMIC_VERBOSE( std::cerr << "using graph loader..." << std::endl; )
             ifstream ifs(filename.c_str());
 			yasmic::graph_ifstream_matrix<> m(ifs);
 			return (load_crm_graph_type(m, filename, rows, cols, vals,
@@ -386,7 +391,7 @@ bool load_crm_matrix(std::string filetype_hint, std::string filename,
 
     if (filetype_hint.compare("cluto") == 0)
     {
-        if (verbose) cerr << "using cluto loader..." << endl;
+        YASMIC_VERBOSE( cerr << "using cluto loader..." << endl; )
 
         ifstream ifs(filename.c_str());
 		yasmic::cluto_ifstream_matrix<> m(ifs);
@@ -395,7 +400,7 @@ bool load_crm_matrix(std::string filetype_hint, std::string filename,
     }
     else if (filetype_hint.compare("graph") == 0)
     {
-        if (verbose) std::cerr << "using graph loader..." << std::endl;
+        YASMIC_VERBOSE( std::cerr << "using graph loader..." << std::endl; )
         ifstream ifs(filename.c_str());
 		yasmic::graph_ifstream_matrix<> m(ifs);
 		return (load_crm_graph_type(m, filename, rows, cols, vals,
@@ -403,7 +408,7 @@ bool load_crm_matrix(std::string filetype_hint, std::string filename,
     }
     else if (filetype_hint.compare("smat") == 0)
     {
-        if (verbose) std::cerr << "using smat loader..." << std::endl;
+        YASMIC_VERBOSE( std::cerr << "using smat loader..." << std::endl; )
 
 		ifstream ifs(filename.c_str());
 		yasmic::ifstream_matrix<> m(ifs);
@@ -412,7 +417,7 @@ bool load_crm_matrix(std::string filetype_hint, std::string filename,
     }
     else
     {
-        if (verbose) std::cerr << "filetype hint didn't help :-(, I'll try the extension loader..." << endl;
+        YASMIC_VERBOSE( std::cerr << "filetype hint didn't help, trying the extension loader..." << endl; )
         return (load_crm_matrix(filename, rows, cols, vals, nr, nc, nzcount));
     }
 }

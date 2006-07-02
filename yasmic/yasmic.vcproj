@@ -252,6 +252,10 @@
 				Filter="util\*.hpp"
 				>
 				<File
+					RelativePath=".\util\crm_matrix.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\util\filtered_matrix.hpp"
 					>
 				</File>
@@ -261,6 +265,14 @@
 				</File>
 				<File
 					RelativePath=".\util\load_crm_matrix.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\util\write_matrix.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\util\write_petsc_matrix.hpp"
 					>
 				</File>
 			</Filter>

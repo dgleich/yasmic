@@ -10,12 +10,18 @@
  * Add defines to control verbose statement in the code.
  */
 
+
+
+
 //
 // this file is somewhat strange.  There are two sections; the first section 
 // simple makes a few define statements
 //
 #ifdef YASMIC_VERBOSE_UTIL_DEFINE
-int verbose;
+namespace yasmic
+{
+    int yasmic_verbose;
+} // namespace yasmic
 #endif // YASMIC_VERBOSE_UTIL_DEFINE
 
 #ifndef YASMIC_VERBOSE_UTIL
@@ -23,13 +29,15 @@ int verbose;
 
 #ifdef YASMIC_USE_VERBOSE
 
-	#define YASMIC_VERBOSE \
-		if (verbose)
+	#define YASMIC_VERBOSE(a) \
+        if (yasmic::yasmic_verbose) \
+        { \
+            a; \
+        } 
 
 #else
 
-	#define YASMIC_VERBOSE \
-		if (0)
+	#define YASMIC_VERBOSE(a) \
 
 #endif 
 

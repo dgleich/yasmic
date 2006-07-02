@@ -430,6 +430,14 @@ namespace boost
   		return (make_iterator_property_map(g.begin_values(), get(edge_index, g)));
 	}
 
+    /*template <class Tag, class RowIter, class ColIter, class ValIter, class Key>
+    inline typename typename property_map<yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>, Tag>::value_type
+		get(Tag t, const yasmic::compressed_row_matrix<RowIter, ColIter, ValIter>& g, Key key)
+	{
+        return get(get(t, g), key);
+  		//return (make_iterator_property_map(g.begin_values(), get(edge_index, g)));
+	}*/
+
 }
 
 #endif // YASMIC_COMPRESSED_ROW_MATRIX_GRAPH

@@ -93,8 +93,6 @@ namespace yasmic
             {
 				return (_ri == other._ri && _ci == other._ci);
             }
-
-			/*difference_type distance_to(compressed_row_nonzero_const_iterator const& other) const */
             
             yasmic::simple_nonzero<
 				typename std::iterator_traits<RowIter>::value_type,
@@ -274,8 +272,6 @@ namespace yasmic
         {
         	return (_nnz);
         }
-
-		//inline size_type row_nnz(index_type r)
         	
         row_iterator begin_rows() const
         {
@@ -291,66 +287,15 @@ namespace yasmic
 		{
 			index_type nzi = *(_rstart + (r));
 			return (row_nonzero_iterator(r, nzi, _cstart + nzi, _vstart + nzi));
-
-			//typedef impl::crm_row_nonzero_iter_help<RowIter, ColIter, ValIter> type_helper;
-
-			/*typedef typename type_helper::nz_index_iter nzi_iter;
-			typedef typename type_helper::row_nonzero_iter_tuple iter_tuple;
-			typedef typename type_helper::row_nonzero_zip_iter row_zip_iterator;
-			typedef typename type_helper::tuple_xform_func zip_xform;
-
-			return (row_nonzero_iterator(
-						row_zip_iterator(
-							iter_tuple(_cstart + *(_rstart + r),
-									   _vstart + *(_rstart + r),
-									   nzi_iter(*(_rstart + r)))
-									   ),
-					   zip_xform(r)));*/
-
-			/*return (row_nonzero_iterator(
-						row_zip_iterator(
-							iter_tuple(_cstart + *(_rstart + r),
-									   _vstart + *(_rstart + r))
-									   ),
-					   zip_xform(r, *(_rstart + (r)))));*/
 		}
 										
 							
 		row_nonzero_iterator end_row(index_type r) const
         {
 			index_type nzi = *(_rstart + (r+1));
-			return (row_nonzero_iterator(r, nzi, _cstart + nzi, _vstart + nzi));
-
-			/*typedef impl::crm_row_nonzero_iter_help<RowIter, ColIter, ValIter> type_helper;
-
-			typedef typename type_helper::nz_index_iter nzi_iter;
-			typedef typename type_helper::row_nonzero_iter_tuple iter_tuple;
-			typedef typename type_helper::row_nonzero_zip_iter row_zip_iterator;
-			typedef typename type_helper::tuple_xform_func zip_xform;
-
-			return (row_nonzero_iterator(
-						row_zip_iterator(
-							iter_tuple(_cstart + *(_rstart + (r+1)),
-									   _vstart + *(_rstart + (r+1)),
-									   nzi_iter(*(_rstart + (r+1))))
-									   ),
-					   zip_xform(r)));*/
+			return (row_nonzero_iterator(r, nzi, _cstart + nzi, _vstart + nzi));	
 		}
         
-        /*row_nonzero_iterator begin_row(index_type r) const
-        {
-			return (row_nonzero_iterator(
-                _rstart + r, _rstart + r+1, _cstart + *(_rstart + r), 
-                _vstart + *(_rstart + r), *(_rstart+(r)), r));
-        }
-        
-        row_nonzero_iterator end_row(index_type r) const
-        {
-			return (row_nonzero_iterator(
-                _rstart + r, _rstart + r+1, _cstart + *(_rstart + (r+1) ), 
-                _vstart + *(_rstart + r), *(_rstart+(r+1)), r ) );
-        }*/
-
 		value_iterator begin_values() const
 		{
 			return (_vstart);
@@ -442,11 +387,20 @@ namespace yasmic
 		*ri = cur_elem;
 	}
 
+    /* ========================================================
+     *  Routines to pack storage
+     * ===================================================== */
+
+
 	template <class RowIter, class ColIter, class ValIter >
 	void pack_storage(compressed_row_matrix<RowIter, ColIter, ValIter>& m)
 	{
 		pack_storage(m, std::plus<typename std::iterator_traits<ValIter>::value_type > ());
 	}
+
+    /* ========================================================
+     *  Routines to sort storage
+     * ===================================================== */
 
 	/**
 	 * The version with a custom sorting operation.  
@@ -455,6 +409,7 @@ namespace yasmic
 	void sort_storage(compressed_row_matrix<RowIter, ColIter, ValIter>& m,
 		StrictWeakOrdering comp)
 	{
+        BOOST_STATIC_ASSERT(0 == 1);
 	}
 
 	namespace impl
@@ -471,16 +426,6 @@ namespace yasmic
 					typename std::iterator_traits<ColIter>::value_type&, 
 					typename std::iterator_traits<ValIter>::value_type& >
 				ref_type;
-
-			/*typedef std::pair<
-					typename std::iterator_traits<ColIter>::value_type, 
-					typename std::iterator_traits<ValIter>::value_type >
-				value_type;
-
-			typedef std::pair<
-					typename std::iterator_traits<ColIter>::value_type&, 
-					typename std::iterator_traits<ValIter>::value_type& >
-				ref_type;*/
 		};
 
 	
@@ -601,9 +546,11 @@ namespace yasmic
 				impl::crm_make_col_val_iter(ci + pos_end, vi + pos_end),
 				impl::crm_col_val_iter_tuple_compare<ColIter,ValIter>());
 		}
-
-
 	}
+
+    /* ========================================================
+     *  Routines to multiply
+     * ===================================================== */
 	
 	/**
 	 * Specialize the multiply operator for this matrix type.
@@ -672,6 +619,10 @@ namespace yasmic
 			}
 		}
 	}
+
+    /* ========================================================
+     *  Routines to find a value
+     * ===================================================== */
 
     /**
 	 * Specialize the value operator for this matrix type.
