@@ -98,7 +98,7 @@ bool load_matrix_to_crm(InputMatrix& m,
 			return (false);
 		}
 
-		if (nzcount != yasmic::nnz(m))
+		if (nzcount != nnz(m))
 		{
 			using namespace std;
 			cerr << "error: number of nonzeros do not match nnz" << endl;
@@ -113,7 +113,7 @@ bool load_matrix_to_crm(InputMatrix& m,
 	index_type cc;
 
 	nzcount = 0;
-	tie(nzi, nzend) = yasmic::nonzeros(m);
+	tie(nzi, nzend) = nonzeros(m);
     for (; nzi != nzend; ++nzi)
     {
 		cr = row(*nzi, m);
@@ -133,7 +133,7 @@ bool load_matrix_to_crm(InputMatrix& m,
 		return (false);
 	}
 
-	if (nzcount != yasmic::nnz(m))
+	if (nzcount != nnz(m))
 	{
 		using namespace std;
 		cerr << "error: number of nonzeros do not match nnz" << endl;
@@ -377,6 +377,19 @@ bool load_crm_matrix(std::string filename,
 	return (false);
 }
 
+namespace yasmic
+{
+namespace impl
+{
+	// this is a workaround for the world's most ridiculous portability
+	// bug between gcc and msvc.
+	int lower_case ( int c )
+	{
+	  return tolower ( c );
+	}
+}
+} 
+
 template <class Index, class Value>
 bool load_crm_matrix(std::string filetype_hint, std::string filename, 
 					std::vector<Index>& rows, std::vector<Index>& cols,
@@ -387,7 +400,7 @@ bool load_crm_matrix(std::string filetype_hint, std::string filename,
 
     // convert the filetype_hint to lower case...
     transform(filetype_hint.begin(),filetype_hint.end(),
-        filetype_hint.begin(), tolower);
+        filetype_hint.begin(), yasmic::impl::lower_case);
 
     if (filetype_hint.compare("cluto") == 0)
     {
