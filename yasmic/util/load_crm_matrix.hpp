@@ -16,6 +16,7 @@
 #ifdef BOOST_MSVC
 #if _MSC_VER >= 1400
 	// disable the warning for ifstream::read
+    #pragma warning( push )
 	#pragma warning( disable : 4996 )
 #endif // _MSC_VER >= 1400
 #endif // BOOST_MSVC
@@ -39,6 +40,17 @@
 #include <yasmic/binary_ifstream_matrix.hpp>
 #include <yasmic/cluto_ifstream_matrix.hpp>
 #include <yasmic/graph_ifstream_matrix.hpp>
+
+#ifdef YASMIC_UTIL_LOAD_GZIP
+
+// include the boost code to do the gzip files.
+#define BOOST_IOSTREAMS_NO_LIB
+#include <boost/iostreams/filtering_stream.hpp>
+#include <yasmic/boost_mod/gzip.hpp>
+// just directly include the BOOST zlib code
+#include <yasmic/boost_mod/zlib.cpp>
+
+#endif // YASMIC_UTIL_LOAD_GZIP
 
 
 
@@ -270,6 +282,35 @@ bool load_crm_graph_type(InputMatrix& m, std::string filename,
 		degrees_data));
 }
 
+/** 
+ * Test if a file with a .graph extension is a smat or not.
+ */
+
+template <class Index, class InputStream>
+bool load_crm_matrix_graph_test(InputStream& ifs)
+{
+    using namespace std;
+
+    string line;
+    getline(ifs,line);
+    istringstream iss(line);
+
+    Index i;
+    iss >> i;
+    iss >> i;
+    iss >> i;
+
+    if (iss.fail())
+    {
+        return (false);
+    }
+    else
+    {
+        return (true);
+    }
+}
+
+
 
 /**
  * Load a CRM matrix from a file into a set of vectors.  
@@ -301,40 +342,80 @@ bool load_crm_matrix(std::string filename,
 		string ext = filename.substr(dot+1);
 		transform(ext.begin(), ext.end(), ext.begin(), (int(*)(int))tolower);	
 
+        // handle the filtering of the iostream
+        bool ios_filter = false;
+
+#ifdef YASMIC_UTIL_LOAD_GZIP
+        typedef boost::iostreams::filtering_stream<boost::iostreams::input_seekable> filtered_ifstream;
+        filtered_ifstream ios_fifs;
+
+        if (ext.compare("gz") == 0)
+        {
+            position dot2 = filename.find_last_of(".",dot-1);
+            if (dot == string::npos)
+            {
+                cerr << "Error: matrix type indeterminate." << endl;
+                return (false);
+            }
+
+            string ext2 = filename.substr(dot2+1, (dot)-(dot2+1));
+		    transform(ext2.begin(), ext2.end(), ext2.begin(), (int(*)(int))tolower);	
+
+            if (ext.compare("gz") == 0)
+            {
+                ios_filter = true;
+                ios_fifs.push(boost::iostreams::gzip_decompressor());
+            }
+
+            ext = ext2;
+        }
+        else
+        {
+        }
+
+#endif // YASMIC_UTIL_LOAD_GZIP
+
         bool smat_graph = false;
 
         if (ext.compare("graph") == 0)
         {
             // if the first line of a .graph file has 3 entries, 
-            ifstream ifs(filename.c_str());
-            string line;
-            getline(ifs,line);
-            istringstream iss(line);
-
-            Index i;
-            iss >> i;
-            iss >> i;
-            iss >> i;
-
-            if (iss.fail())
+            if (ios_filter)
             {
-                smat_graph = false;
+                ifstream ifs(filename.c_str());
+                ios_fifs.push(ifs);
+                smat_graph = load_crm_matrix_graph_test<Index>(ios_fifs);
+                ios_fifs.pop();
             }
             else
             {
-                smat_graph = true;
-            }
+                ifstream ifs(filename.c_str());
+                smat_graph = load_crm_matrix_graph_test<Index>(ifs);
+            }            
         }
-
 
 		if (ext.compare("smat") == 0 || smat_graph)
 		{
 			YASMIC_VERBOSE( std::cerr << "using smat loader..." << std::endl; )
 
-			ifstream ifs(filename.c_str());
-			yasmic::ifstream_matrix<> m(ifs);
-			return (load_crm_graph_type(m, filename, rows, cols, vals,
-						nr, nc, nzcount));
+            if (ios_filter)
+            {
+                ifstream ifs(filename.c_str(), ios_base::in | ios_base::binary);
+                ios_fifs.push(ifs);
+			    yasmic::ifstream_matrix<> m(ios_fifs);
+			    return (load_crm_graph_type(m, filename, rows, cols, vals,
+				    		nr, nc, nzcount));
+            }
+            else
+            {
+                ifstream ifs(filename.c_str());
+                ios_fifs.push(ifs);
+                yasmic::ifstream_matrix<> m(ios_fifs);
+
+			    //yasmic::ifstream_matrix<> m(ifs);
+			    return (load_crm_graph_type(m, filename, rows, cols, vals,
+				    		nr, nc, nzcount));
+            }
 		}
 		else if (ext.compare("bsmat") == 0)
 		{
@@ -438,7 +519,7 @@ bool load_crm_matrix(std::string filetype_hint, std::string filename,
 #ifdef BOOST_MSVC
 #if _MSC_VER >= 1400
 	// restore the warning for ifstream::read
-	#pragma warning( default : 4996 )
+	#pragma warning( pop )
 #endif // _MSC_VER >= 1400
 #endif // BOOST_MSVC
 
