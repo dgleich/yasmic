@@ -29,6 +29,7 @@
 #ifdef BOOST_MSVC
 #if _MSC_VER >= 1400
 	// disable the warning for ifstream::read
+    #pragma warning( push )
 	#pragma warning( disable : 4996 )
 #endif // _MSC_VER >= 1400
 #endif // BOOST_MSVC
@@ -326,7 +327,7 @@ bool load_crm_graph(std::string filename,
 #ifdef BOOST_MSVC
 #if _MSC_VER >= 1400
 	// restore the warning for ifstream::read
-	#pragma warning( default : 4996 )
+	#pragma warning( pop )
 #endif // _MSC_VER >= 1400
 #endif // BOOST_MSVC
 

@@ -1,6 +1,15 @@
 #ifndef YASMIC_BINARY_IFSTREAM_MATRIX
 #define YASMIC_BINARY_IFSTREAM_MATRIX
 
+#ifdef BOOST_MSVC
+#if _MSC_VER >= 1400
+	// disable the warning for ifstream::read
+	#pragma warning( push )
+	#pragma warning( disable : 4996 )
+#endif // _MSC_VER >= 1400
+#endif // BOOST_MSVC
+
+
 #include <fstream>
 #include <boost/tuple/tuple.hpp>
 #include <iterator>
@@ -8,12 +17,6 @@
 
 #include <yasmic/generic_matrix_operations.hpp>
 
-#ifdef BOOST_MSVC
-#if _MSC_VER >= 1400
-	// disable the warning for ifstream::read
-	#pragma warning( disable : 4996 )
-#endif // _MSC_VER >= 1400
-#endif // BOOST_MSVC
 
 namespace yasmic
 {
@@ -170,7 +173,7 @@ namespace yasmic
 #ifdef BOOST_MSVC
 #if _MSC_VER >= 1400
 	// restore the warning for ifstream::read
-	#pragma warning( default : 4996 )
+	#pragma warning( pop )
 #endif // _MSC_VER >= 1400
 #endif // BOOST_MSVC
 

@@ -1,6 +1,12 @@
 #ifndef YASMIC_COMPRESSED_ROW_MATRIX
 #define YASMIC_COMPRESSED_ROW_MATRIX
 
+#if _MSC_VER >= 1400
+    // disable the warning for deprecated c++ commands
+    #pragma warning( push )
+	#pragma warning( disable : 4996 )
+#endif // _MSC_VER >= 1400
+
 #include <iterator>
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/iterator/counting_iterator.hpp>
@@ -9,10 +15,11 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 
-#include <algorithm>
+
 #include <functional>
+/*#include <algorithm>
 #include <boost/functional.hpp>
-#include <vector>
+#include <vector>*/
 
 #include <yasmic/tuple_utility.hpp>
 #include <limits>
@@ -654,6 +661,10 @@ namespace yasmic
 
 }
 
+#if _MSC_VER >= 1400
+	// disable the warning for deprecated c++ commands
+	#pragma warning( pop )
+#endif // _MSC_VER >= 1400
 
 
 #endif // YASMIC_COMPRESSED_ROW_MATRIX
