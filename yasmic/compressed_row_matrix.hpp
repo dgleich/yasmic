@@ -17,9 +17,9 @@
 
 
 #include <functional>
-/*#include <algorithm>
+#include <algorithm>
 #include <boost/functional.hpp>
-#include <vector>*/
+#include <vector>
 
 #include <yasmic/tuple_utility.hpp>
 #include <limits>
@@ -416,7 +416,7 @@ namespace yasmic
 	void sort_storage(compressed_row_matrix<RowIter, ColIter, ValIter>& m,
 		StrictWeakOrdering comp)
 	{
-        BOOST_STATIC_ASSERT(0 == 1);
+        //BOOST_STATIC_ASSERT(0 == 1);
 	}
 
 	namespace impl

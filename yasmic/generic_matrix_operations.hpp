@@ -244,7 +244,7 @@ namespace yasmic
     {
         using namespace yasmic;
 
-        BOOST_STATIC_ASSERT(0);
+        //BOOST_STATIC_ASSERT(0 == 1);
 
         typedef typename smatrix_traits<Matrix>::index_type itype;
         typedef typename smatrix_traits<Matrix>::value_type vtype;
