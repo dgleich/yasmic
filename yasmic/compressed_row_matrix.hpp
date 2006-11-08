@@ -15,12 +15,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 
-
 #include <functional>
-#include <algorithm>
-#include <boost/functional.hpp>
-#include <vector>
-
 #include <yasmic/tuple_utility.hpp>
 #include <limits>
 
@@ -658,6 +653,69 @@ namespace yasmic
 
         return (0);
 	}
+
+    /**
+     * csr_matrix is a more user manageable compressed sparse row matrix type.
+     * It is based on the same ideas as the compressed_row_matrix, but designed 
+     * to be less general and more specific.  
+     *
+     * csr_matrix uses compressed_row_matrix for some of its operations.
+     *
+     * The idea is that an application will use the csr_matrix structure to 
+     * manage a sparse matrix and design algorithms that are NOT more 
+     * generally applicable. 
+     */
+    /*template <class IndexType, class ValueType, class SizeType=IndexType>
+    struct csr_matrix
+    {
+        SizeType nrows;
+        SizeType ncols;
+        SizeType nnz;
+
+        IndexType* ai;
+
+        IndexType* aj;
+        ValueType* a;
+    };
+
+    template <class IndexType, class ValueType, class SizeType>
+    smatrix_traits<csr_matrix<IndexType, ValueType, SizeType> >
+    {
+        typedef compressed_row_matrix<IndexType*, IndexType*, ValueType*>
+            compressed_row_matrix_type;
+
+        typedef IndexType index_type;
+        typedef ValueType value_type;
+        typedef typename compressed_row_matrix_type::nonzero_iterator nonzero_iterator;
+        typedef typename compressed_row_matrix_type::nonzero_descriptor nonzero_descriptor;
+
+	    typedef typename compressed_row_matrix_type::row_iterator row_iterator;
+		
+	    typedef typename compressed_row_matrix_type::row_nonzero_iterator row_nonzero_iterator;
+	    typedef typename compressed_row_matrix_type::row_nonzero_descriptor row_nonzero_descriptor;
+
+	    typedef typename SizeType nz_index_type;
+		
+	    typedef void column_iterator;
+	    //typedef typename Mat::column_nonzero_iterator column_nonzero_iterator;
+
+	    typedef unsymmetric_tag symmetry_category;
+	    };
+    }
+
+    template <class IndexType, class ValueType, class SizeType>
+    SizeType nrows(const csr_matrix<IndexType, ValueType, SizeType>& m)
+    { return m.nrows; }
+
+    template <class IndexType, class ValueType, class SizeType>
+    SizeType ncols(const csr_matrix<IndexType, ValueType, SizeType>& m)
+    { return m.ncols; }
+
+    template <class IndexType, class ValueType, class SizeType>
+    SizeType nnz(const csr_matrix<IndexType, ValueType, SizeType>& m)
+    { return m.nnz; }*/
+
+
 
 }
 

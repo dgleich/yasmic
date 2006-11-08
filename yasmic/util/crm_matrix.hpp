@@ -1,6 +1,12 @@
 #ifndef YASMIC_UTIL_CRM_MATRIX
 #define YASMIC_UTIL_CRM_MATRIX
 
+#if _MSC_VER >= 1400
+	// disable the warning for ifstream::read
+    #pragma warning( push )
+	#pragma warning( disable : 4996 )
+#endif // _MSC_VER >= 1400
+
 #include <iterator>
 #include <numeric>
 #include <algorithm>
@@ -189,6 +195,11 @@ void build_bipartite_crm(std::vector<index_type>& rows, std::vector<index_type>&
 	// load the matrix
 	load_matrix_to_crm(b, rows.begin(), cols.begin(), vals.begin());
 }
+
+#if _MSC_VER >= 1400
+	// restore the warning for ifstream::read
+    #pragma warning( pop )
+#endif // _MSC_VER >= 1400
 
 #endif //YASMIC_UTIL_CRM_MATRIX
 

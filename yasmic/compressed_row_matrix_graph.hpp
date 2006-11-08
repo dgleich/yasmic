@@ -1,6 +1,12 @@
 #ifndef YASMIC_COMPRESSED_ROW_MATRIX_GRAPH
 #define YASMIC_COMPRESSED_ROW_MATRIX_GRAPH
 
+#if _MSC_VER >= 1400
+    // disable the warning for deprecated c++ commands
+    #pragma warning( push )
+	#pragma warning( disable : 4996 )
+#endif // _MSC_VER >= 1400
+
 #include <boost/iterator.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/pending/integer_range.hpp>
@@ -439,6 +445,11 @@ namespace boost
 	}*/
 
 }
+
+#if _MSC_VER >= 1400
+	// disable the warning for deprecated c++ commands
+	#pragma warning( pop )
+#endif // _MSC_VER >= 1400
 
 #endif // YASMIC_COMPRESSED_ROW_MATRIX_GRAPH
 

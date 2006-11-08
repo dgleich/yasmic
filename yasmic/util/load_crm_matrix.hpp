@@ -13,13 +13,12 @@
  * Load a matrix into a crm data structure.
  */
 
-#ifdef BOOST_MSVC
 #if _MSC_VER >= 1400
-	// disable the warning for ifstream::read
+	// disable the warning for deprecated c++ commands
     #pragma warning( push )
 	#pragma warning( disable : 4996 )
 #endif // _MSC_VER >= 1400
-#endif // BOOST_MSVC
+
 
 #include <cctype>
 #include <iostream>
@@ -52,8 +51,6 @@
 #include <yasmic/boost_mod/zlib.cpp>
 
 #endif // YASMIC_UTIL_LOAD_GZIP
-
-
 
 /**
  * This function actually loads the data from a matrix file.
@@ -527,12 +524,10 @@ bool load_crm_matrix(std::string filetype_hint, std::string filename,
     }
 }
 
-#ifdef BOOST_MSVC
 #if _MSC_VER >= 1400
 	// restore the warning for ifstream::read
 	#pragma warning( pop )
 #endif // _MSC_VER >= 1400
-#endif // BOOST_MSVC
 
 #endif // YASMIC_UTIL_LOAD_CRM_MATRIX
 

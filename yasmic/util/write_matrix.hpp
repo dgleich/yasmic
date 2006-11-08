@@ -61,6 +61,8 @@ namespace impl
                             << (index_type)column(*nzi, m) << " "
                             << (value_type)value(*nzi, m) << std::endl;
                 }
+
+                return (true);
             }
         };
 
@@ -95,6 +97,8 @@ namespace impl
                 	f.write((char*)&c, sizeof(index_type));
                 	f.write((char*)&v, sizeof(value_type));
                 }
+
+                return (true);
             }
         };
 
@@ -137,7 +141,7 @@ namespace impl
 			    // convert to big endian...
 				{
 					int* intptr = &rows[0];
-					unsigned int maxi = rows.size();
+					unsigned int maxi = (unsigned int)rows.size();
 					for (unsigned int i = 0; i < maxi; ++i)
 					{
 			            impl::endian::swap_int_4(intptr);
@@ -148,7 +152,7 @@ namespace impl
 				if (cols.size() > 0)
 				{
 					int* intptr = &cols[0];
-					unsigned int maxi = cols.size();
+					unsigned int maxi = (unsigned int)cols.size();
 					for (unsigned int i = 0; i < maxi; ++i)
 					{
 						impl::endian::swap_int_4(intptr);
@@ -159,7 +163,7 @@ namespace impl
 				if (vals.size() > 0)
 				{
 					double* doubleptr = &vals[0];
-					unsigned int maxi = vals.size();
+					unsigned int maxi = (unsigned int)vals.size();
 					for (unsigned int i = 0; i < maxi; ++i)
 					{
 						impl::endian::swap_double_8(doubleptr);
@@ -185,12 +189,12 @@ namespace impl
 			
 				if (cols.size() > 0)
 				{
-					f.write((char *)&cols[0], sizeof(int)*nz);
+                    f.write((char *)&cols[0], sizeof(int)*(std::streamsize)nz);
 				}
 			
 				if (vals.size() > 0)
 				{
-					f.write((char *)&vals[0], sizeof(double)*nz);
+					f.write((char *)&vals[0], sizeof(double)*(std::streamsize)nz);
 				}
 			
 				return (true);

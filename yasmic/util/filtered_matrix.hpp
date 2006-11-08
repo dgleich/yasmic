@@ -1,6 +1,12 @@
 #ifndef YASMIC_UTIL_FILTERED_MATRIX
 #define YASMIC_UTIL_FILTERED_MATRIX
 
+#if _MSC_VER >= 1400
+    // disable the warning for deprecated c++ commands
+    #pragma warning( push )
+	#pragma warning( disable : 4996 )
+#endif // _MSC_VER >= 1400
+
 #include <boost/iterator/filter_iterator.hpp>
 #include <algorithm>
 #include <functional>
