@@ -15,6 +15,8 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 
+#include <vector> 
+
 #include <functional>
 #include <yasmic/tuple_utility.hpp>
 #include <limits>
