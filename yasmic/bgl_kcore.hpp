@@ -21,6 +21,14 @@
 #include <boost/graph/iteration_macros.hpp>
 #include <boost/iterator/reverse_iterator.hpp>
 
+#ifdef BOOST_MSVC
+#if _MSC_VER >= 1400
+	// disable the warning for ifstream::read
+    #pragma warning( push )
+	#pragma warning( disable : 4996 )
+#endif // _MSC_VER >= 1400
+#endif // BOOST_MSVC
+
 namespace boost
 {
 
@@ -149,6 +157,14 @@ namespace boost
 	}
 
 }
+
+#ifdef BOOST_MSVC
+#if _MSC_VER >= 1400
+	// disable the warning for ifstream::read
+    #pragma warning( pop )
+#endif // _MSC_VER >= 1400
+#endif // BOOST_MSVC
+
 
 #endif // YASMIC_BGL_KCORE
 

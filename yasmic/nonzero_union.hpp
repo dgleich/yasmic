@@ -105,9 +105,6 @@ namespace impl
 		typename nonzero_union_iter_help<Matrix1,Matrix2>::nz_iter i2, i2end;
 
 		bool using_m2;
-		
-
-
     };
 }
 

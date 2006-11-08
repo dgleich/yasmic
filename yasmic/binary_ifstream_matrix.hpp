@@ -38,7 +38,7 @@ namespace yasmic
 				: _str(0), _r(0), _c(0), _v(0)
 			{}
             
-            binary_ifstream_matrix_const_iterator(std::ifstream &str)
+            binary_ifstream_matrix_const_iterator(std::istream &str)
 				: _str(&str), _r(0), _c(0), _v(0)
             { increment(); }
             
@@ -73,7 +73,7 @@ namespace yasmic
 			i_index_type _r, _c;
 			i_value_type _v;
 
-			std::ifstream* _str;
+			std::istream* _str;
         };
 
 	}
@@ -82,9 +82,9 @@ namespace yasmic
 	template <class index_type = int, class value_type = double, class size_type = int>
 	struct binary_ifstream_matrix
 	{
-		std::ifstream& _f;
+		std::istream& _f;
 
-		binary_ifstream_matrix(std::ifstream& f)
+		binary_ifstream_matrix(std::istream& f)
 			: _f(f) 
 		{}
 
