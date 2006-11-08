@@ -40,7 +40,7 @@ namespace impl
  * and vals.  It tries to restore it afterwards, but no 
  * guarantees.
  */
-template <class VecRows, class VecCols, class VecVals)
+template <class VecRows, class VecCols, class VecVals>
 bool write_petsc_matrix(std::ostream& f,
                  VecRows& rows, VecCols& cols, VecVals& vals)
 {

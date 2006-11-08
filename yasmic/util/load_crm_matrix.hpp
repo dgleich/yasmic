@@ -41,11 +41,12 @@
 #include <yasmic/cluto_ifstream_matrix.hpp>
 #include <yasmic/graph_ifstream_matrix.hpp>
 
+#define BOOST_IOSTREAMS_NO_LIB
+#include <boost/iostreams/filtering_stream.hpp>
+
 #ifdef YASMIC_UTIL_LOAD_GZIP
 
 // include the boost code to do the gzip files.
-#define BOOST_IOSTREAMS_NO_LIB
-#include <boost/iostreams/filtering_stream.hpp>
 #include <yasmic/boost_mod/gzip.hpp>
 // just directly include the BOOST zlib code
 #include <yasmic/boost_mod/zlib.cpp>
@@ -343,11 +344,12 @@ bool load_crm_matrix(std::string filename,
 		transform(ext.begin(), ext.end(), ext.begin(), (int(*)(int))tolower);	
 
         // handle the filtering of the iostream
+        typedef boost::iostreams::filtering_stream<boost::iostreams::input_seekable> filtered_ifstream;
+        filtered_ifstream ios_fifs;
         bool ios_filter = false;
 
 #ifdef YASMIC_UTIL_LOAD_GZIP
-        typedef boost::iostreams::filtering_stream<boost::iostreams::input_seekable> filtered_ifstream;
-        filtered_ifstream ios_fifs;
+        
 
         if (ext.compare("gz") == 0)
         {
@@ -382,7 +384,7 @@ bool load_crm_matrix(std::string filename,
             // if the first line of a .graph file has 3 entries, 
             if (ios_filter)
             {
-                ifstream ifs(filename.c_str());
+                ifstream ifs(filename.c_str(), ios_base::in | ios_base::binary);
                 ios_fifs.push(ifs);
                 smat_graph = load_crm_matrix_graph_test<Index>(ios_fifs);
                 ios_fifs.pop();
@@ -409,8 +411,7 @@ bool load_crm_matrix(std::string filename,
             else
             {
                 ifstream ifs(filename.c_str());
-                ios_fifs.push(ifs);
-                yasmic::ifstream_matrix<> m(ios_fifs);
+                yasmic::ifstream_matrix<> m(ifs);
 
 			    //yasmic::ifstream_matrix<> m(ifs);
 			    return (load_crm_graph_type(m, filename, rows, cols, vals,
@@ -421,10 +422,21 @@ bool load_crm_matrix(std::string filename,
 		{
 			YASMIC_VERBOSE( std::cerr << "using bsmat loader..." << std::endl; )
 
-			ifstream ifs(filename.c_str(), ios::binary);
-			yasmic::binary_ifstream_matrix<> m(ifs);
-			return (load_crm_graph_type(m, filename, rows, cols, vals,
-						nr, nc, nzcount));
+            ifstream ifs(filename.c_str(), ios_base::in | ios::binary);
+            
+            if (ios_filter)
+            {
+			    yasmic::binary_ifstream_matrix<> m(ifs);
+			    return (load_crm_graph_type(m, filename, rows, cols, vals,
+				    		nr, nc, nzcount));
+            }
+            else
+            {
+                ios_fifs.push(ifs);
+                yasmic::binary_ifstream_matrix<> m(ios_fifs);
+			    return (load_crm_graph_type(m, filename, rows, cols, vals,
+				    		nr, nc, nzcount));
+            }
 		}
         else if (ext.compare("mat") == 0 || ext.compare("cmat") == 0 
                  || ext.compare("cgraph") == 0)
