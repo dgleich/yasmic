@@ -80,7 +80,7 @@ namespace impl
         
         bool equal(matrix_row_col_graph_nz_iterator const& other) const
         {
-			return (_i == other._i && _repeat == other._repeat);
+			return (i == other.i && _repeat == other._repeat);
         }
         
         typename matrix_row_col_graph_nz_iter_help<Matrix>::nz_type
@@ -170,8 +170,9 @@ template <class Matrix>
 inline typename impl::matrix_row_col_graph_help<Matrix>::nzs_ret_type 
 nonzeros(matrix_row_col_graph<Matrix>& tm)
 {
-    return std::make_pair( matrix_row_col_graph_nz_iterator<Matrix>(tm._m),
-        matrix_row_col_graph_nz_iterator<Matrix>(tm._m,true));
+ 
+    return std::make_pair( impl::matrix_row_col_graph_nz_iterator<Matrix>(tm._m),
+        impl::matrix_row_col_graph_nz_iterator<Matrix>(tm._m,true));
 }
 
 } // namespace yasmic
