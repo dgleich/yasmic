@@ -42,7 +42,9 @@ void symmetrize_crm(std::vector<index_type>& rows, std::vector<index_type>& cols
 	vals.resize(nzcount);
 
     typedef compressed_row_matrix<
-		std::vector<index_type>::iterator, std::vector<index_type>::iterator, std::vector<value_type>::iterator  >
+		typename std::vector<index_type>::iterator, 
+		typename std::vector<index_type>::iterator,
+		typename std::vector<value_type>::iterator  >
         crs_matrix;  
 
 	typedef transpose_matrix<crs_matrix> t_matrix;
@@ -92,7 +94,9 @@ void pack_and_sort_storage_crm(std::vector<index_type>& rows, std::vector<index_
     using namespace yasmic;
 
     typedef compressed_row_matrix<
-		std::vector<index_type>::iterator, std::vector<index_type>::iterator, std::vector<value_type>::iterator  >
+		typename std::vector<index_type>::iterator,
+		typename std::vector<index_type>::iterator,
+		typename std::vector<value_type>::iterator >
         crs_matrix;  
 
     crs_matrix mlarge(rows.begin(), rows.end(), cols.begin(),cols.end(), 
@@ -118,8 +122,10 @@ void transpose_crm(std::vector<index_type>& rows, std::vector<index_type>& cols,
 	std::fill(rows.begin(), rows.end(), 0);
 
     typedef compressed_row_matrix<
-		std::vector<index_type>::iterator, std::vector<index_type>::iterator, std::vector<value_type>::iterator  >
-        crs_matrix;  
+		typename std::vector<index_type>::iterator,
+		typename std::vector<index_type>::iterator,
+		typename std::vector<value_type>::iterator >
+        crs_matrix;
 
 	typedef transpose_matrix<crs_matrix> t_matrix;
 
@@ -165,8 +171,10 @@ void build_bipartite_crm(std::vector<index_type>& rows, std::vector<index_type>&
 	vals.resize(nzcount);
 
     typedef compressed_row_matrix<
-		std::vector<index_type>::iterator, std::vector<index_type>::iterator, std::vector<value_type>::iterator  >
-        crs_matrix;  
+		typename std::vector<index_type>::iterator,
+		typename std::vector<index_type>::iterator,
+		typename std::vector<value_type>::iterator >
+        crs_matrix;
 
 	typedef matrix_row_col_graph<crs_matrix> bipartite_graph;
 

@@ -349,8 +349,6 @@ bool load_crm_matrix(std::string filename,
         bool ios_filter = false;
 
 #ifdef YASMIC_UTIL_LOAD_GZIP
-        
-
         if (ext.compare("gz") == 0)
         {
             position dot2 = filename.find_last_of(".",dot-1);
@@ -367,6 +365,7 @@ bool load_crm_matrix(std::string filename,
             {
                 ios_filter = true;
                 ios_fifs.push(boost::iostreams::gzip_decompressor());
+                YASMIC_VERBOSE( std::cerr << "detected gzip format..." << std::endl; )
             }
 
             ext = ext2;
@@ -426,14 +425,14 @@ bool load_crm_matrix(std::string filename,
             
             if (ios_filter)
             {
-			    yasmic::binary_ifstream_matrix<> m(ifs);
+            	ios_fifs.push(ifs);
+                yasmic::binary_ifstream_matrix<> m(ios_fifs);
 			    return (load_crm_graph_type(m, filename, rows, cols, vals,
 				    		nr, nc, nzcount));
             }
             else
             {
-                ios_fifs.push(ifs);
-                yasmic::binary_ifstream_matrix<> m(ios_fifs);
+                yasmic::binary_ifstream_matrix<> m(ifs);
 			    return (load_crm_graph_type(m, filename, rows, cols, vals,
 				    		nr, nc, nzcount));
             }
