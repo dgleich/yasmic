@@ -42,8 +42,9 @@ namespace impl
  */
 template <class VecRows, class VecCols, class VecVals>
 bool write_petsc_matrix(std::ostream& f,
-                 VecRows& rows, VecCols& cols, VecVals& vals)
-{
+                 VecRows& rows, VecCols& cols, VecVals& vals,
+                 int nr, int nc, std::size_t nz)
+{	
     // convert to differences
 	adjacent_difference(++rows.begin(), rows.end(), rows.begin());
 
@@ -89,9 +90,9 @@ bool write_petsc_matrix(std::ostream& f,
 	header[2] = nc;
 	header[3] = 0;
 
-	swap_int_4(&header[0]);
-	swap_int_4(&header[1]);
-	swap_int_4(&header[2]);
+	impl::endian::swap_int_4(&header[0]);
+	impl::endian::swap_int_4(&header[1]);
+	impl::endian::swap_int_4(&header[2]);
 
 	f.write((char *)&header, sizeof(int)*4);
 	f.write((char *)&rows[0], sizeof(int)*nr); 
@@ -137,7 +138,7 @@ bool write_petsc_matrix(std::ostream& f, const Matrix& m)
 
 	load_matrix_to_crm(m, rows.begin(), cols.begin(), vals.begin(), false);
 
-    return (write_petsc(f, rows, cols, vals));
+    return (write_petsc(f, rows, cols, vals, nr, nc, nz));
 }
 
 
