@@ -143,7 +143,8 @@ public:
 
 	typedef typename smatrix_traits<Matrix1>::size_type size_type;
 	typedef typename smatrix_traits<Matrix1>::nz_index_type nz_index_type;
-	typedef unsymmetric_tag symmetry_category;
+
+    typedef void properties;
 };
 
 namespace impl 

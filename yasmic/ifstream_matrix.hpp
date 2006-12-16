@@ -55,7 +55,7 @@ namespace yasmic
 		
 		typedef void column_iterator;
 
-		typedef unsymmetric_tag symmetry_category;
+        typedef void properties;
     };
 
 	namespace impl

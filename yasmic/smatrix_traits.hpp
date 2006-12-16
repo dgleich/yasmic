@@ -12,8 +12,9 @@
 
 namespace yasmic
 {
-	struct unsymmetric_tag { };
-	struct symmetric_tag { };
+    struct no_property_tag {};
+    struct nonzero_index_tag { };
+    struct row_access_tag { };
 
 	template <class Op>
 	struct op_traits
@@ -36,11 +37,8 @@ namespace yasmic
 		typedef typename Mat::row_nonzero_descriptor row_nonzero_descriptor;
 
 		typedef typename Mat::size_type nz_index_type;
-		
-		typedef typename Mat::column_iterator column_iterator;
-		//typedef typename Mat::column_nonzero_iterator column_nonzero_iterator;
 
-		typedef typename Mat::symmetry_category symmetry_category;
+        typedef typename Mat::properties properties;
 	};
 }
 

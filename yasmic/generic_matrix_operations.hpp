@@ -224,6 +224,14 @@ namespace yasmic
     {
 		return (std::make_pair(m.begin_nonzeros(), m.end_nonzeros()));
     }
+
+    template <class Matrix>
+    inline std::pair<typename smatrix_traits<Matrix>::row_iterator,
+                     typename smatrix_traits<Matrix>::row_iterator>
+    rows(Matrix& m)
+    {
+        return (std::make_pair(m.begin_rows(), m.end_rows()));
+    }
     
     template <class Matrix>
     inline std::pair<typename smatrix_traits<Matrix>::row_nonzero_iterator,
