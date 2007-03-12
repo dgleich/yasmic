@@ -201,7 +201,7 @@ namespace boost
     const BinaryPredicate& compare, const BinaryFunction& combine, 
     const Infinity& inf, const Zero& zero)
   {
-      dummy_predecessor_matrix p_matrix;
+      detail::dummy_predecessor_matrix p_matrix;
       return floyd_warshall_all_pairs_shortest_paths(
           g, d, p_matrix, w, compare, combine, inf, zero);
   }
