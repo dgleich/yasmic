@@ -213,7 +213,8 @@ namespace yasmic
 		typedef void column_iterator;
 		typedef void column_nonzero_iterator;
 
-		typedef unsymmetric_tag symmetry_category;
+		//typedef unsymmetric_tag symmetry_category;
+        typedef void properties;
 		
 		/**
 		 * Simple constructor for all the iterators.  This function

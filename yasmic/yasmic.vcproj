@@ -228,7 +228,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\matrix_row_col_graph.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\nonzero_union.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\simple_csr_matrix.hpp"
 				>
 			</File>
 			<File
@@ -274,6 +282,42 @@
 				<File
 					RelativePath=".\util\write_petsc_matrix.hpp"
 					>
+				</File>
+			</Filter>
+			<Filter
+				Name="boost_mod"
+				>
+				<File
+					RelativePath=".\boost_mod\bellman_ford_shortest_paths.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\boost_mod\betweenness_centrality.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\boost_mod\floyd_warshall_shortest.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\boost_mod\gzip.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\boost_mod\johnson_all_pairs_shortest.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\boost_mod\zlib.cpp"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 		</Filter>

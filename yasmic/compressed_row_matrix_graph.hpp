@@ -72,6 +72,7 @@ namespace boost
 		};
 	}
 
+    
 
 	template <class RowIter, class ColIter, class ValIter>
 	struct graph_traits< yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> >
@@ -108,6 +109,16 @@ namespace boost
             return std::numeric_limits<vertex_descriptor>::max();
         }
 	};
+
+    template <class RowIter, class ColIter, class ValIter>
+    struct edge_property_type< yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> >  {
+        typedef void type;
+    };
+
+    template <class RowIter, class ColIter, class ValIter>
+    struct vertex_property_type< yasmic::compressed_row_matrix<RowIter, ColIter, ValIter> >  {
+        typedef void type;
+    };
 
 	namespace impl
 	{
