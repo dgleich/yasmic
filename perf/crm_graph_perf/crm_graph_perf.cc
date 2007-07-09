@@ -24,6 +24,7 @@
 #include <yasmic/binary_ifstream_matrix.hpp>
 #include <yasmic/compressed_row_matrix.hpp>
 #include <yasmic/compressed_row_matrix_graph.hpp>
+#include <yasmic/simple_csr_matrix_as_graph.hpp>
 
 #include <yasmic/iterator_utility.hpp>
 
@@ -74,6 +75,7 @@ int main(int argc, char **argv)
 	typedef compressed_row_matrix<
         vector<int>::iterator, vector<int>::iterator, constant_iterator<double> >
         crs_matrix;
+    typedef simple_csr_matrix<int, double> csr_matrix;
     
     ifstream fs(filename.c_str(), ios::binary);
 	simple_matrix m(fs);
@@ -135,6 +137,32 @@ int main(int argc, char **argv)
 
 	cout << "connected components time: " << t0.elapsed() << " seconds" << endl;
 	cout << "components: " << num_components << endl;
+
+
+    csr_matrix csr;
+    csr.ai = &rows[0];
+    csr.aj = &cols[0];
+    csr.a = &vals[0];
+    csr.nrows = nr;
+    csr.ncols = nc;
+    csr.nnz = nnz(m);
+
+	t0.restart();
+
+	num_components = 0;
+
+	for (int ntry = 0; ntry < MAX_TRY; ntry++)
+	{
+		vector<int> component_map(num_vertices(csr));
+		// compute connected components
+		num_components = strong_components(csr, 
+			make_iterator_property_map(component_map.begin(), 
+			get(vertex_index, csr)));
+	}
+
+	cout << "connected components time: " << t0.elapsed() << " seconds" << endl;
+	cout << "components: " << num_components << endl;
+
 
 	t0.restart();
 
