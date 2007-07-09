@@ -67,20 +67,20 @@ public:
     simple_csr_edge_iterator() : ai(NULL), current_edge(), end_of_this_vertex(0) {}
 
     simple_csr_edge_iterator(
-                EdgeIndex* g_ai,
+                const YASMIC_SIMPLE_CSR_GRAPH_TYPE& g,
                 value_type current_edge,
                 EdgeIndex end_of_this_vertex)
-    : ai(g_ai), current_edge(current_edge),
+    : ai(g.ai), current_edge(current_edge),
       end_of_this_vertex(end_of_this_vertex) {}
 
     // From InputIterator
     reference operator*() const { return current_edge; }
     pointer operator->() const { return &current_edge; }
 
-    bool operator==(const simple_csr_edge_iterator<YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>& o) const {
+    bool operator==(const simple_csr_edge_iterator<Index,Value,EdgeIndex>& o) const {
         return current_edge == o.current_edge;
     }
-    bool operator!=(const simple_csr_edge_iterator<YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>& o) const {
+    bool operator!=(const simple_csr_edge_iterator<Index,Value,EdgeIndex>& o) const {
         return current_edge != o.current_edge;
     }
 
@@ -129,14 +129,14 @@ private:
     // iterator_facade requirements
     const edge_descriptor& dereference() const { return _e; }
 
-    bool equal(const yasmic::impl::simple_csr_out_edge_iterator<YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>& other) const
+    bool equal(const simple_csr_out_edge_iterator<Index,Value,EdgeIndex>& other) const
     { return _e == other._e; }
 
     void increment() { ++_e.i; }
     void decrement() { ++_e.i; }
     void advance(difference_type n) { _e.i += n; }
 
-    difference_type distance_to(const yasmic::impl::simple_csr_out_edge_iterator<YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>& other) const
+    difference_type distance_to(const yasmic::impl::simple_csr_out_edge_iterator<Index,Value,EdgeIndex>& other) const
     { return other._e.i - _e.idx; }
 
     edge_descriptor _e;
@@ -223,7 +223,7 @@ namespace boost {
                 Index r=0;
                 while (g.ai[r] != g.ai[r+1]) { ++r; }
                 return std::make_pair(ei(g,e(r,0),g.ai[r+1]),
-                                       ei(g,e(g.nrows,g.nnz,0)));
+                                       ei(g,e(g.nrows,g.nnz),0));
             }
     }
     //
@@ -268,7 +268,7 @@ namespace boost {
 	template <YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS, typename Tag>
     struct property_map<YASMIC_SIMPLE_CSR_GRAPH_TYPE, Tag> {
     private:
-        typedef typename identity_property_map vertex_index_type;
+        typedef identity_property_map vertex_index_type;
         typedef typename graph_traits<YASMIC_SIMPLE_CSR_GRAPH_TYPE>::edge_descriptor
             edge_descriptor;
         typedef detail::simple_csr_edge_index_map<EdgeIndex,edge_descriptor> edge_index_type;
@@ -302,24 +302,24 @@ namespace boost {
     get(vertex_index_t,
         const YASMIC_SIMPLE_CSR_GRAPH_TYPE&, Index v)
     {
-      return v;
+        return v;
     }
 
     template<YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>
     inline typename property_map<YASMIC_SIMPLE_CSR_GRAPH_TYPE, edge_index_t>::const_type
     get(edge_index_t, const YASMIC_SIMPLE_CSR_GRAPH_TYPE&)
     {
-      typedef typename property_map<YASMIC_SIMPLE_CSR_GRAPH_TYPE, edge_index_t>::const_type
-        result_type;
-      return result_type();
+        typedef typename property_map<YASMIC_SIMPLE_CSR_GRAPH_TYPE, edge_index_t>::const_type
+            result_type;
+        return result_type();
     }
 
     template<YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>
     inline EdgeIndex
     get(edge_index_t, const YASMIC_SIMPLE_CSR_GRAPH_TYPE&,
-        typename YASMIC_SIMPLE_CSR_GRAPH_TYPE::edge_descriptor e)
+        typename graph_traits<YASMIC_SIMPLE_CSR_GRAPH_TYPE>::edge_descriptor e)
     {
-      return e.i;
+        return e.i;
     }
 
     template<YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>
@@ -332,7 +332,7 @@ namespace boost {
     template<YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>
     inline Value
     get(edge_weight_t, const YASMIC_SIMPLE_CSR_GRAPH_TYPE& g, 
-        typename YASMIC_SIMPLE_CSR_GRAPH_TYPE::edge_descriptor e)
+        typename graph_traits<YASMIC_SIMPLE_CSR_GRAPH_TYPE>::edge_descriptor e)
     {
         return g.a[e.i];
     }

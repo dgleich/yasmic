@@ -39,6 +39,10 @@ struct simple_csr_matrix
     NzSizeType* ai;
     IndexType* aj;
     ValueType* a;
+    
+    simple_csr_matrix(IndexType nrows, IndexType ncols, NzSizeType nnz,
+         NzSizeType *ai, IndexType *aj, ValueType *a)
+         : nrows(nrows), ncols(ncols), nnz(nnz), ai(ai), aj(aj), a(a) {}
 };
 
 
@@ -185,3 +189,4 @@ ValueType value(impl::csr_nonzero<IndexType,ValueType> nz)
 } // namespace yasmic
 
 #endif /* YASMIC_SIMPLE_CSR_MATRIX_HPP */
+
