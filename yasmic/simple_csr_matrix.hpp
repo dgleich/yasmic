@@ -9,9 +9,16 @@
 
 /*
  * David Gleich
- * Stanford University
+ * Copyright, Stanford University, 2007
+ */
+
+/*
  * 9 November 2006
- * Copyright, Stanford University
+ * Initial version
+ *
+ * 8 July 2007
+ * Commented out non-working code
+ * Updated to work with simple_csr_matrix_as_graph.hpp
  */
 
 #include <yasmic/smatrix_traits.hpp>
@@ -40,6 +47,8 @@ struct simple_csr_matrix
     IndexType* aj;
     ValueType* a;
     
+    simple_csr_matrix() {}
+
     simple_csr_matrix(IndexType nrows, IndexType ncols, NzSizeType nnz,
          NzSizeType *ai, IndexType *aj, ValueType *a)
          : nrows(nrows), ncols(ncols), nnz(nnz), ai(ai), aj(aj), a(a) {}
