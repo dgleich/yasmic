@@ -23,6 +23,7 @@
 #include <boost/integer.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/integer.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 
 #define YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS \
@@ -45,7 +46,8 @@ namespace yasmic {
         struct simple_csr_graph_traversal : 
             public boost::vertex_list_graph_tag,
 		    public boost::incidence_graph_tag,
-		    public boost::edge_list_graph_tag { };
+		    public boost::edge_list_graph_tag, 
+            public boost::adjacency_graph_tag { };
         template <YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>
         class simple_csr_edge_iterator;
         template <YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>
@@ -63,6 +65,8 @@ public:
     typedef const value_type* pointer;
 
     typedef value_type reference;
+    // required due to "bug" in InputIterator concept, it is unused
+    typedef typename boost::int_t<CHAR_BIT * sizeof(EdgeIndex)>::fast difference_type;
    
     simple_csr_edge_iterator() : ai(NULL), current_edge(), end_of_this_vertex(0) {}
 
@@ -172,6 +176,10 @@ namespace boost {
         typedef EdgeIndex degree_size_type;
         typedef yasmic::impl::simple_csr_out_edge_iterator<Index,Value,EdgeIndex>
             out_edge_iterator;
+        // requirements for AdjacencyGraph
+        typedef Index* adjacency_iterator;
+        // requirements for various bugs
+        typedef void in_edge_iterator;
     };
     //
     // implement the requirements for VertexListGraph
@@ -242,6 +250,15 @@ namespace boost {
             typedef typename graph_traits<YASMIC_SIMPLE_CSR_GRAPH_TYPE>::edge_descriptor e;
             
             return std::make_pair(ei(e(v,g.ai[v])),ei(e(v+1,g.ai[v+1])));
+    }
+    //
+    // implement the requirements for adjacency_iterator
+    //
+    template <YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>
+    inline std::pair< typename graph_traits<YASMIC_SIMPLE_CSR_GRAPH_TYPE>::adjacency_iterator,
+                      typename graph_traits<YASMIC_SIMPLE_CSR_GRAPH_TYPE>::adjacency_iterator >
+        adjacent_vertices(Index v, const YASMIC_SIMPLE_CSR_GRAPH_TYPE& g) { 
+            return std::make_pair(&g.aj[v],&g.aj[v+1]);
     }
     //
     // implement the functions for property maps
@@ -336,6 +353,16 @@ namespace boost {
     {
         return g.a[e.i];
     }
+    
+    template<YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>
+    struct edge_property_type< YASMIC_SIMPLE_CSR_GRAPH_TYPE >  {
+        typedef void type;
+    };
+
+    template<YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS>
+    struct vertex_property_type< YASMIC_SIMPLE_CSR_GRAPH_TYPE >  {
+        typedef void type;
+    };
 	
 } // end namespace boost
 
