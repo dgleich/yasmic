@@ -23,9 +23,12 @@
 namespace boost {
 
     // A linear time O(m) algorithm to compute the indegree core number 
-    // of a graph.
+    // of a graph for unweighted graphs.
     //
-    // The algorithm comes from:
+    // and a O((n+m) log n) algorithm to compute the in-edge-weight core
+    // numbers of a weighted graph.
+    //
+    // The linear algorithm comes from:
     // Vladimir Batagelj and Matjaz Zaversnik, "An O(m) Algorithm for Cores 
     // Decomposition of Networks."  Sept. 1 2002.
 
@@ -54,7 +57,8 @@ namespace boost {
         };
                 
         
-        
+        // the core numbers start as the indegree or inweight.  This function
+        // will initialize these values
         template <typename Graph, typename CoreMap, typename EdgeWeightMap>
         void compute_in_degree_map(Graph& g, CoreMap d, EdgeWeightMap wm)
         {
@@ -81,6 +85,8 @@ namespace boost {
             typedef typename graph_traits<Graph>::vertex_descriptor vertex;
             while (!Q.empty()) 
             {
+                // remove v from the Q, and then decrease the core numbers 
+                // of its successors
                 vertex v = Q.top(); 
                 Q.pop();
                 v_cn = get(c,v);
@@ -235,6 +241,13 @@ namespace boost {
         typedef typename graph_traits<Graph>::vertices_size_type size_type;
         detail::compute_in_degree_map(g,c,wm);
         return detail::core_numbers_dispatch(g,c,wm,get(vertex_index,g));
+    }
+    
+    template <typename Graph, typename CoreMap>
+    typename property_traits<CoreMap>::value_type
+    weighted_core_numbers(Graph& g, CoreMap c)
+    {
+        return core_numbers(g,c,get(edge_weight,g));
     }
 
 } // namespace boost
