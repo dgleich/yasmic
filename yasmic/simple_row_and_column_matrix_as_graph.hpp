@@ -33,13 +33,11 @@
 
 namespace yasmic {
     namespace impl {
-
         struct simple_rac_graph_traversal : 
             public boost::vertex_list_graph_tag,
-		    public boost::incidence_graph_tag,
 		    public boost::edge_list_graph_tag, 
             public boost::adjacency_graph_tag,
-            public boost::bidirection_graph_tag { };
+            public boost::bidirectional_graph_tag { };
 
         template <YASMIC_SIMPLE_RAC_TEMPLATE_PARAMS>
         class simple_rac_in_edge_iterator;
@@ -62,12 +60,14 @@ public:
     typedef typename boost::int_t<CHAR_BIT * sizeof(EdgeIndex)>::fast 
         difference_type;
 
-    simple_rac_in_edge_iterator() {}
-
     // Implicit copy constructor OK
-    explicit simple_rac_in_edge_iterator(IndexType *atj, NzSizeType *atid)
+    explicit simple_rac_in_edge_iterator(Index *atj, EdgeIndex *atid)
         : atj(atj), atid(atid) 
     {}
+
+    simple_rac_in_edge_iterator() {}
+
+    
 
 private:
     // iterator_facade requirements
@@ -85,8 +85,8 @@ private:
     difference_type distance_to(const simple_rac_in_edge_iterator<Index,Value,EdgeIndex>& other) const
     { return other.atid - atid; }
 
-    IndexType *atj;
-    NzSizeType *atid;
+    Index *atj;
+    EdgeIndex *atid;
 
     friend class boost::iterator_core_access;
 };
@@ -124,10 +124,18 @@ namespace boost {
         in_edges(Index v, const YASMIC_SIMPLE_RAC_GRAPH_TYPE& g) { 
             typedef typename graph_traits<YASMIC_SIMPLE_RAC_GRAPH_TYPE>::in_edge_iterator ei;
             EdgeIndex start = g.ati[v];
-            EdgeIndex end = g.ati[v+1]
+            EdgeIndex end = g.ati[v+1];
             return std::make_pair(ei(&g.atj[start],&g.atid[start]),
                                   ei(&g.atj[end],&g.atid[end]));
     }
+    //
+    // implement the property map, just inherit from csr matrix
+    //
+    template <YASMIC_SIMPLE_RAC_TEMPLATE_PARAMS, typename Tag>
+    struct property_map<YASMIC_SIMPLE_RAC_GRAPH_TYPE, Tag>
+        : public property_map< yasmic::simple_csr_matrix<Index,Value,EdgeIndex>, Tag>
+    {};
+
 	
 } // end namespace boost
 

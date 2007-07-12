@@ -15,6 +15,7 @@ namespace yasmic
     struct no_property_tag {};
     struct nonzero_index_tag { };
     struct row_access_tag { };
+    struct column_access_tag { };
 
 	template <class Op>
 	struct op_traits
