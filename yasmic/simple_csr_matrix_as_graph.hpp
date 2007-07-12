@@ -229,7 +229,7 @@ namespace boost {
             }
             else {
                 Index r=0;
-                while (g.ai[r] != g.ai[r+1]) { ++r; }
+                while (g.ai[r] == g.ai[r+1]) { ++r; }
                 return std::make_pair(ei(g,e(r,0),g.ai[r+1]),
                                        ei(g,e(g.nrows,g.nnz),0));
             }
