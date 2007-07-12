@@ -67,8 +67,6 @@ public:
 
     simple_rac_in_edge_iterator() {}
 
-    
-
 private:
     // iterator_facade requirements
     edge_descriptor dereference() const { return edge_descriptor(*atj,*atid); }
@@ -78,9 +76,7 @@ private:
 
     void increment() { ++atid; ++atj; }
     void decrement() { ++atid; ++atj; }
-    void advance(difference_type n) { 
-        while (n-->0) { _e.i = *(++atid); _e.r = *(++atj); } 
-    }
+    void advance(difference_type n) { atid+=n; atj+=n; } 
 
     difference_type distance_to(const simple_rac_in_edge_iterator<Index,Value,EdgeIndex>& other) const
     { return other.atid - atid; }

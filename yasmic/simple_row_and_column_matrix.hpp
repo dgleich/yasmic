@@ -42,7 +42,7 @@ struct simple_row_and_column_matrix
     simple_row_and_column_matrix(IndexType nrows, IndexType ncols, NzSizeType nnz,
          NzSizeType *ai, IndexType *aj, ValueType *a,
          NzSizeType *ati, IndexType* atj, NzSizeType *atid)
-         : simple_csr_matrix(nrows,ncols,nnz,ai,aj,a),
+         : simple_csr_matrix<IndexType,ValueType,NzSizeType>(nrows,ncols,nnz,ai,aj,a),
            ati(ati), atj(atj), atid(atid) {}
 };
 
