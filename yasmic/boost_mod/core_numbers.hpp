@@ -137,6 +137,9 @@ namespace boost {
             typedef typename graph_traits<Graph>::degree_size_type degree_type;
             typedef typename graph_traits<Graph>::vertex_descriptor vertex;
             typename graph_traits<Graph>::vertex_iterator vi,vi_end;
+            
+            // store the vertex core numbers
+            typename property_traits<CoreMap>::value_type v_cn = 0;
 
 		    // compute the maximum degree (degrees are in the coremap)
             typename graph_traits<Graph>::degree_size_type max_deg = 0;
@@ -175,11 +178,12 @@ namespace boost {
             // now simulate removing the vertices
             for (size_type i=0; i < num_vertices(g); ++i) {
 			    vertex v = vert[i];
+                v_cn = get(c,v);
                 typename graph_traits<Graph>::out_edge_iterator oi,oi_end;
                 for (tie(oi,oi_end) = out_edges(v,g); oi!=oi_end; ++oi) {
                     vertex u = target(*oi,g);
                     // if c[u] > c[v], then u is still in the graph,
-                    if (get(c,u) > get(c,v)) {
+                    if (get(c,u) > v_cn) {
                         degree_type deg_u = get(c,u);
                         degree_type pos_u = get(pos,u);
                         // w is the first vertex with the same degree as u
@@ -205,7 +209,7 @@ namespace boost {
                     }
                 }
             }
-            return get(c,vert[num_vertices(g)-1]);
+            return v_cn;
         }
 
     } // namespace detail
