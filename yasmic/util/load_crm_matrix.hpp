@@ -37,6 +37,7 @@
 
 #include <yasmic/ifstream_matrix.hpp>
 #include <yasmic/binary_ifstream_matrix.hpp>
+#include <yasmic/binary_ifstream_graph.hpp>
 #include <yasmic/cluto_ifstream_matrix.hpp>
 #include <yasmic/graph_ifstream_matrix.hpp>
 
@@ -414,6 +415,26 @@ bool load_crm_matrix(std::string filename,
 				    		nr, nc, nzcount));
             }
 		}
+        else if (ext.compare("bssmat") == 0)
+        {
+            YASMIC_VERBOSE( std::cerr << "using bssmat loader..." << std::endl; )
+
+            ifstream ifs(filename.c_str(), ios_base::in | ios::binary);
+            
+            if (ios_filter)
+            {
+                ios_fifs.push(ifs);
+                yasmic::binary_ifstream_graph<> m(ios_fifs);
+                return (load_crm_graph_type(m, filename, rows, cols, vals,
+                            nr, nc, nzcount));
+            }
+            else
+            {
+                yasmic::binary_ifstream_graph<> m(ifs);
+                return (load_crm_graph_type(m, filename, rows, cols, vals,
+                            nr, nc, nzcount));
+            }
+        }
 		else if (ext.compare("bsmat") == 0)
 		{
 			YASMIC_VERBOSE( std::cerr << "using bsmat loader..." << std::endl; )
@@ -474,7 +495,7 @@ namespace impl
 	// bug between gcc and msvc.
 	int lower_case ( int c )
 	{
-	  return tolower ( c );
+	    return tolower ( c );
 	}
 }
 } 
