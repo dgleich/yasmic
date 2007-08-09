@@ -324,7 +324,7 @@ namespace boost {
     typename property_traits<CoreMap>::value_type
     weighted_core_numbers(Graph& g, CoreMap c)
     {
-        return core_numbers(g,c,get(edge_weight,g));
+        return weighted_core_numbers(g,c,make_core_numbers_visitor(null_visitor()));
     }
     
     template <typename Graph, typename CoreMap, typename CoreNumVisitor>
