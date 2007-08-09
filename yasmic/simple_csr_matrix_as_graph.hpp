@@ -15,6 +15,10 @@
 /*
  * 9 July 2007
  * Initial version
+ *
+ * 22 July 2007
+ * Added remove_signedness struct to make the size_types in
+ * the graph_traits correct unsigned types.
  */
 
 #include <yasmic/simple_csr_matrix.hpp>
@@ -23,6 +27,7 @@
 #include <boost/integer.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
 #include <boost/integer.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 
@@ -33,6 +38,16 @@
 
 namespace yasmic {
     namespace impl {
+        template <typename Integer>
+        struct remove_signedness {
+            typedef typename boost::mpl::if_< boost::is_unsigned<Integer>, 
+                Integer, unsigned>::type type;
+        };
+        template <> struct remove_signedness<long> { typedef unsigned long type; };
+        template <> struct remove_signedness<int> { typedef unsigned int type; };
+        template <> struct remove_signedness<short> { typedef unsigned short type; };
+        template <> struct remove_signedness<char> { typedef unsigned char type; };
+        
         template <typename Index, typename EdgeIndex>
         class simple_csr_edge {
         public:
@@ -166,14 +181,14 @@ namespace boost {
             return std::numeric_limits<vertex_descriptor>::max();
         }
         // requirements for VertexListGraph
-        typedef Index vertices_size_type;
+        typedef typename yasmic::impl::remove_signedness<Index>::type vertices_size_type;
         typedef counting_iterator<Index> vertex_iterator;
         // requirements for EdgeListGraph
-        typedef EdgeIndex edges_size_type;
+        typedef typename yasmic::impl::remove_signedness<EdgeIndex>::type edges_size_type;
         typedef yasmic::impl::simple_csr_edge_iterator<Index,Value,EdgeIndex> 
             edge_iterator;
         // requirements for IncidenceGraph
-        typedef EdgeIndex degree_size_type;
+        typedef edges_size_type degree_size_type;
         typedef yasmic::impl::simple_csr_out_edge_iterator<Index,Value,EdgeIndex>
             out_edge_iterator;
         // requirements for AdjacencyGraph
