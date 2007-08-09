@@ -117,6 +117,21 @@ namespace impl
             template <class RowAccessMatrix>
             bool write_matrix(std::ostream& f, RowAccessMatrix& m)
             {
+                using namespace yasmic;
+                f << nrows(m) << " " 
+                  << ncols(m) << " " 
+                  << nnz(m) << std::endl;
+                  
+                typename smatrix_traits<RowAccessMatrix>::row_iterator ri, riend;
+                typename smatrix_traits<RowAccessMatrix>::row_nonzero_iterator rnzi, rnziend;
+                for (boost::tie(ri,riend) = rows(m); ri!=riend; ++ri) {
+                    for (boost::tie(rnzi,rnziend)=row_nonzeros(*ri,m); rnzi!=rnziend; ++rnzi) {
+                        f << (column(*rnzi,m)+1) << " " 
+                          << (value(*rnzi,m)) << " ";
+                    }
+                    f << std::endl;
+                }
+                
                 return (true);
             }
         };
