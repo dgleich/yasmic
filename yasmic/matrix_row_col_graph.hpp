@@ -134,7 +134,7 @@ public:
 
 	typedef typename smatrix_traits<Matrix>::size_type size_type;
 	typedef typename smatrix_traits<Matrix>::nz_index_type nz_index_type;
-	typedef typename smatrix_traits<Matrix>::symmetry_category symmetry_category;
+	typedef typename smatrix_traits<Matrix>::properties properties;
 };
 
 namespace impl 

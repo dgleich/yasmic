@@ -108,7 +108,7 @@ namespace yasmic
 		typedef void row_nonzero_descriptor;
 		typedef void column_iterator;
 
-		typedef typename smatrix_traits<Matrix>::symmetry_category symmetry_category;
+		typedef typename smatrix_traits<Matrix>::properties properties;
 
 		typedef typename smatrix_traits<Matrix>::nz_index_type nz_index_type;
 
