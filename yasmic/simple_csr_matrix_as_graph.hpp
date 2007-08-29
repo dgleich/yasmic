@@ -19,6 +19,10 @@
  * 22 July 2007
  * Added remove_signedness struct to make the size_types in
  * the graph_traits correct unsigned types.
+ * 
+ * 29 August 2007
+ * Added get function for edge_index_property_map to the boost::detail 
+ * namespace to fix a compile bug on g++-4.1
  */
 
 #include <yasmic/simple_csr_matrix.hpp>
@@ -288,14 +292,13 @@ namespace boost {
           typedef Edge key_type;
           typedef readable_property_map_tag category;
         }; // end simple_csr_edge_index_map
+        
+        template<typename EdgeIndex, typename Edge>
+        inline EdgeIndex
+            get(const detail::simple_csr_edge_index_map<EdgeIndex, Edge>&,
+                const typename detail::simple_csr_edge_index_map<EdgeIndex, Edge>::key_type& key)
+        { return key.i; }
     } // end namespace boost::detail
-
-    template<typename EdgeIndex, typename Edge>
-    inline EdgeIndex
-        get(const detail::simple_csr_edge_index_map<EdgeIndex, Edge>&,
-            const typename detail::simple_csr_edge_index_map<EdgeIndex, Edge>::key_type& key)
-    { return key.i; }
-
 	  
 	template <YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS, typename Tag>
     struct property_map<YASMIC_SIMPLE_CSR_GRAPH_TYPE, Tag> {
