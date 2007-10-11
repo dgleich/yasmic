@@ -50,7 +50,12 @@ struct simple_csr_matrix
     IndexType* aj;
     ValueType* a;
     
-    simple_csr_matrix() {}
+    // an extra indextype to serve as the default value of ai for
+    // an empty matrix
+    IndexType empty;
+    
+    simple_csr_matrix() 
+        : nrows(0), ncols(0), nnz(0), empty(0), ai(&empty), aj(NULL), a(NULL) {}
 
     simple_csr_matrix(IndexType nrows, IndexType ncols, NzSizeType nnz,
          NzSizeType *ai, IndexType *aj, ValueType *a)
