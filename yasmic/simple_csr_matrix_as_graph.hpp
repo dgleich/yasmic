@@ -182,7 +182,7 @@ namespace boost {
         typedef yasmic::impl::simple_csr_graph_traversal traversal_category;
         static vertex_descriptor null_vertex()
         {
-            return std::numeric_limits<vertex_descriptor>::max();
+            return std::numeric_limits<vertex_descriptor>::max BOOST_PREVENT_MACRO_SUBSTITUTION ();
         }
         // requirements for VertexListGraph
         typedef typename yasmic::impl::remove_signedness<Index>::type vertices_size_type;

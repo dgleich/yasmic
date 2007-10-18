@@ -200,7 +200,7 @@ namespace boost {
 		    // compute the maximum degree (degrees are in the coremap)
             typename graph_traits<Graph>::degree_size_type max_deg = 0;
 		    for (tie(vi,vi_end) = vertices(g); vi!=vi_end; ++vi) { 
-                max_deg = (std::max)(max_deg, get(c,*vi));
+                max_deg = (std::max<graph_traits<Graph>::degree_size_type>)(max_deg, get(c,*vi));
             }
             // store the vertices in bins by their degree
             // allocate two extra locations to ease boundary cases
