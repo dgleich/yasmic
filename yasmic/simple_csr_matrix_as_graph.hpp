@@ -33,6 +33,7 @@
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/integer.hpp>
+#include <yasmic/boost_mod/integer_extra.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 
 #define YASMIC_SIMPLE_CSR_TEMPLATE_PARAMS \
