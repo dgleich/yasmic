@@ -11,7 +11,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory=""
-				CommandArguments="../testfile.txt ../testfile2.bsmat ../testfile.mat"
+				CommandArguments="../testfile.txt ../testfile2.bsmat e:\data\test\sprand-10-10.mat"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"

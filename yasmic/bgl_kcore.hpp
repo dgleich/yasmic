@@ -29,7 +29,8 @@
 
 namespace boost
 {
-
+    //
+    //
 	template <class Graph, class KCoreMap, class PositionMap>
 	void core_numbers(const Graph& g, KCoreMap kcm, PositionMap pos)
 	{
@@ -120,7 +121,6 @@ namespace boost
 				{
 					size_type deg_u = kcm[u];
 					size_type pos_u = pos[u];
-					
 
 					// w is the first vertex with the same degree as u
 					// (this is the resort operation!)
@@ -153,7 +153,6 @@ namespace boost
 			}
 		}
 	}
-
 }
 
 #if _MSC_VER >= 1400

@@ -25,6 +25,7 @@
 #include <yasmic/compressed_row_matrix.hpp>
 #include <yasmic/compressed_row_matrix_graph.hpp>
 #include <yasmic/simple_csr_matrix_as_graph.hpp>
+#include <yasmic/boost_mod/kruskal_min_spanning_tree.hpp>
 
 #include <yasmic/iterator_utility.hpp>
 
@@ -122,7 +123,7 @@ int main(int argc, char **argv)
 
 	cout << "matrix load time: " << t0.elapsed() << " seconds" << endl;
 
-	t0.restart();
+	/*t0.restart();
 
 	int num_components = 0;
 
@@ -196,6 +197,17 @@ int main(int argc, char **argv)
 	cout << "connected components time: " << t0.elapsed() << " seconds" << endl;
 	cout << "components: " << num_components << endl;
 
-	t0.restart();
+	t0.restart();*/
+
+    {
+        for (int ntry = 0; ntry < MAX_TRY; ntry++) {
+            typedef simple_csr_matrix<int,double> crs_weighted_graph;
+            crs_weighted_graph g(nr, nr, nnz(m), &rows[0], &cols[0], &vals[0]);
+            std::vector<graph_traits<crs_weighted_graph>::edge_descriptor> 
+                oi(nr-1);
+            std::vector<graph_traits<crs_weighted_graph>::edge_descriptor>::iterator
+                oi_end = kruskal_minimum_spanning_tree(g,oi.begin());
+        }
+    }
 }
 

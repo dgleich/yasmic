@@ -240,6 +240,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\simple_csr_matrix_as_graph.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\simple_row_and_column_matrix.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\smatrix_traits.hpp"
 				>
 			</File>
@@ -296,11 +304,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\boost_mod\clustering_coefficients.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\boost_mod\core_numbers.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\boost_mod\floyd_warshall_shortest.hpp"
 					>
 				</File>
 				<File
 					RelativePath=".\boost_mod\gzip.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\boost_mod\integer_extra.hpp"
 					>
 				</File>
 				<File

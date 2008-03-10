@@ -6,7 +6,6 @@
 	ProjectGUID="{9C33DDCE-E1B4-4425-AA51-D0191FA4BB27}"
 	RootNamespace="crm_graph"
 	Keyword="Win32Proj"
-	SignManifests="true"
 	>
 	<Platforms>
 		<Platform
@@ -117,6 +116,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
+				AdditionalIncludeDirectories="../../;e:\dev\lib\boost_1_33_0"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"

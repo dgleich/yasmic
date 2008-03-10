@@ -18,10 +18,11 @@
 #include <algorithm>
 
 #include <numeric>
+#include <yasmic/compressed_row_matrix_graph.hpp>
+#include <yasmic/simple_csr_matrix_as_graph.hpp>
+#include <yasmic/simple_row_and_column_matrix_as_graph.hpp>
 
 #include <yasmic/ifstream_as_matrix.hpp>
-#include <yasmic/compressed_row_matrix.hpp>
-#include <yasmic/compressed_row_matrix_graph.hpp>
 
 #include <boost/graph/iteration_macros.hpp>
 
@@ -44,7 +45,7 @@ int main(int argc, char **argv)
     typedef compressed_row_matrix<
         vector<int>::iterator, vector<int>::iterator, vector<double>::iterator >
         crs_matrix;
-        
+    typedef simple_csr_matrix<int,double> simple_csr;
     
     ifstream m(filename.c_str());
     
@@ -54,6 +55,7 @@ int main(int argc, char **argv)
     vector<int> rows(nr+1);
     vector<int> cols(nnz(m));
     vector<double> vals(nnz(m));
+    
     
     {
     	vector<int> cur(nr);
@@ -77,6 +79,14 @@ int main(int argc, char **argv)
     	}
     }
      
+    simple_csr crs;
+    crs.ai = &rows[0];
+    crs.aj = &cols[0];
+    crs.a = &vals[0];
+    crs.nrows = nr;
+    crs.ncols = nc;
+    crs.nnz = nnz(m);
+
     crs_matrix crm(rows.begin(), rows.end(), cols.begin(), cols.end(),
             vals.begin(), vals.end(), nr, nc, nnz(m));
     
@@ -85,9 +95,10 @@ int main(int argc, char **argv)
     cout << "ncols: " << ncols(crm) << endl;
     cout << "nnz: " << nnz(crm) << endl;
 
-	boost::property_map<crs_matrix, boost::edge_weight_t>::type edge_weight_map = get(boost::edge_weight, crm);
+	
 
-	{
+	/*{
+        boost::property_map<crs_matrix, boost::edge_weight_t>::type edge_weight_map = get(boost::edge_weight, crm);
     	smatrix_traits<crs_matrix>::nonzero_iterator nzi, nzend;
     	tie(nzi, nzend) = nonzeros(crm);
     	
@@ -119,6 +130,7 @@ int main(int argc, char **argv)
 
 
 	{
+        boost::property_map<crs_matrix, boost::edge_weight_t>::type edge_weight_map = get(boost::edge_weight, crm);
 		using namespace boost;
 		typedef graph_traits<crs_matrix> traits;
 
@@ -140,4 +152,62 @@ int main(int argc, char **argv)
 		}
 
 	}
+
+    {
+        boost::property_map<simple_csr, boost::edge_weight_t>::type edge_weight_map = get(boost::edge_weight, crs);
+		using namespace boost;
+		typedef graph_traits<simple_csr> traits;
+
+		traits::vertex_iterator vi,viend;
+		BGL_FORALL_VERTICES(u, crs, simple_csr)
+		{
+			cout << u << " has degree " << out_degree(u,crs) << endl;
+
+			cout << " by outedges ... " << endl;
+
+			BGL_FORALL_OUTEDGES(u, e, crs, simple_csr)
+			{
+				cout << source(e,crs) << " links to " << target(e, crs) << " with weight " << edge_weight_map[e] << endl;
+			}
+		}
+	}*/
+
+    vector<int> ati(ncols(m)+1), atj(nnz(m)), atid(nnz(m));
+    build_row_and_column_from_csr(crs, &ati[0], &atj[0], &atid[0]);
+    typedef yasmic::simple_row_and_column_matrix<int,double> simple_rac;
+    simple_rac rac(
+        nr,nc,nnz(m),&rows[0],&cols[0],&vals[0],&ati[0],&atj[0],&atid[0]);
+
+    {
+        boost::property_map<simple_rac, 
+            boost::edge_weight_t>::type edge_weight_map = get(boost::edge_weight, rac);
+		using namespace boost;
+		typedef graph_traits<simple_rac > traits;
+
+		traits::vertex_iterator vi,viend;
+		BGL_FORALL_VERTICES(u, rac, simple_rac)
+		{
+			cout << u << " has out degree " << out_degree(u,rac) << endl;
+
+			cout << " by outedges ... " << endl;
+
+			BGL_FORALL_OUTEDGES(u, e, rac, simple_rac)
+			{
+				cout << source(e,rac) << " links to " << target(e, rac) << " with weight " << edge_weight_map[e] << endl;
+                //cout << source(e,rac) << " links to " << target(e, rac) << endl;
+			}
+
+            cout << u << " has in degree " << in_degree(u,rac) << endl;
+
+            cout << " by in edges ... " << endl;
+
+            BGL_FORALL_INEDGES(u, e, rac, simple_rac)
+			{
+				cout << source(e,rac) << " links to " << target(e, rac) << " with weight " << edge_weight_map[e] << endl;
+                //cout << source(e,rac) << " links to " << target(e, rac) << endl;
+			}
+		}
+	}
+
+    return (0);
 }

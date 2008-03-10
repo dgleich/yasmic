@@ -3,93 +3,22 @@
     <h1>
         yasmic concepts</h1>
     <p>
-        These are the overarching concepts implemented and used in yasmic.</p>
-    <h4>
-    </h4>
-    <h3>
-        Usage Concepts</h3>
+        smatrix_traits</p>
     <ul>
-        <li>LinearOperator</li>
-        <li>TransposeLinearOperator</li>
-        <li>DimensionedLinearOperator</li>
-        <li>NumericMatrix</li>
+        <li>smatrix_traits&lt;Matrix&gt;::value_type</li>
+        <li>smatrix_traits&lt;Matrix&gt;::size_type</li>
+        <li>smatrix_traits&lt;Matrix&gt;::index_type</li>
+        <li>smatrix_traits&lt;Matrix&gt;::nz_index_type</li>
+        <li>smatrix_traits&lt;Matrix&gt;::nz_size_type</li>
+        <li>smatrix_traits&lt;Matrix&gt;::properties</li>
+        <li>smatrix_traits&lt;Matrix&gt;::nonzero_descriptor</li>
+        <li>ssmatrix_traits&lt;Matrix&gt;::nonzero_iterator</li>
+        <li>smatrix_traits&lt;Matrix&gt;::row_nonzero_descriptor</li>
+        <li>smatrix_traits&lt;Matrix&gt;::row_nonzero_iterator</li>
+        <li>smatrix_traits&lt;Matrix&gt;::row_iterator</li>
     </ul>
-    <h3>
-        Access Concepts</h3>
-    <ul>
-        <li>NonZeroIteratable</li>
-        <li>RowIteratable</li>
-        <li>ColumnIteratable</li>
-        <li>RandomNonZeroAccess</li>
-    </ul>
-    <h2>
-        LinearOperator</h2>
     <p>
-        Let A be an instance of a linear operator, and let op_type be the type of operator
-        A.</p>
-    <h4>
-        Requirements</h4>
-    <h5>
-    </h5>
-    <h5>
-        op</h5>
-    <p>
-        template &lt;class ArgType, class ResultType&gt;<br />
-        void op(const op_type&amp; A, const ArgType x, ResultType y);</p>
-    <p>
-        op performs the operation y = A(x) for the linear operator A.&nbsp; Typically, this
-        operator will be the multiplication operator, so y = A*x.&nbsp; The types are explicitly
-        left ambiguous.&nbsp;
-    </p>
-    <p>
-        Personally, I can't think of a use for such a simple construct as a linear operator,
-        but as this is somewhat nice mathematically, I'll leave it in for now.&nbsp;
-    </p>
-    <h2>
-    </h2>
-    <h2>
-        TransposeLinearOperator</h2>
-    <p>
-        Let A be an instance of a transpose linear operator, and let op_type be the type
-        of operator A.&nbsp;
-    </p>
-    <h4>
-        Requirements</h4>
-    <h5>
-    </h5>
-    <h5>
-        transpose_op</h5>
-    <p>
-        template &lt;class ResultType, class ArgType&gt;<br />
-        void transpose_op(const op_type&amp; A, const ResultType x, ArgType y);</p>
-    <p>
-        The types in the transpose operator are reversed because they map from the output
-        back to the input.&nbsp;
-    </p>
-    <p>
-        Again, I can't really think of a use for such a simple construct.&nbsp;
-    </p>
-    <h2>
-        DimensionedLinearOperator</h2>
-    <p>
-        Let A be an instance of a dimensioned linear operator, and let op_type be the type
-        of dimensioned operator A.</p>
-    <h4>
-        Requirements</h4>
-    <h5>
-        size_type</h5>
-    <p>
-        op_traits&lt;op_type&gt;::size_type</p>
-    <p>
-        size_type gives a type for the dimensions of the matrix</p>
-    <h5>
-        dimension</h5>
-    <p>
-        std::pair&lt;size_type, size_type&gt; dimension(A)</p>
-    <p>
-        dimension gives the dimensions of operator A, that is, the size of the argument
-        and result.&nbsp;
-    </p>
+        &nbsp;</p>
 
 </body>
 </html>
