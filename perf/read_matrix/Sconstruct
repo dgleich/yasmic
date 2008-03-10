@@ -1,0 +1,10 @@
+# python SCons build script
+
+user_lib_path = "/home/dgleich/dev/lib"
+boost_path = "%s/boost_1_33_1" %(user_lib_path)
+yasmic_path = "/home/dgleich/dev/yasmic"
+
+env = Environment()
+env.Append(CCFLAGS="-O2")
+
+env.Program("read_matrix.cc", LIBS=["z"], CPPPATH=[boost_path, yasmic_path, "/home/dgleich/dev/c++-util"])
